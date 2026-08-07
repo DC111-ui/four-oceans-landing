@@ -4,7 +4,7 @@ Marketing landing page for **Four Oceans Group**, a Pretoria-based procurement a
 
 Four Oceans Group sources genuine building materials, groceries, automotive parts and household appliances in South Africa and delivers them door to door in Zimbabwe, alongside cross-border freight, storage and relocation services (student storage, Hatfield move-outs, full household relocations).
 
-**Live site:** _added after first deploy_
+**Live site:** https://main.d3k9c66eza09v0.amplifyapp.com
 
 ## Tech stack
 
