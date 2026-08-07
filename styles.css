@@ -397,7 +397,6 @@ input, select, textarea { font: inherit; }
 .serve-card__icon {
   width: 44px; height: 44px;
   border-radius: 50%;
-  background: rgba(28,140,134,.1);
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 16px;
 }
@@ -410,6 +409,11 @@ input, select, textarea { font: inherit; }
   margin: 0 0 6px;
 }
 .serve-card p { font-size: .88rem; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+.serve-card--teal .serve-card__icon { background: var(--teal-deep); }
+.serve-card--teal h3 { color: var(--teal-deep); }
+.serve-card--gold .serve-card__icon { background: var(--gold); }
+.serve-card--gold h3 { color: var(--gold-deep); }
 
 /* ============ Poster campaign marquee ============ */
 .poster-campaign { padding: 44px 0 36px; background: var(--navy-deep); overflow: hidden; }
