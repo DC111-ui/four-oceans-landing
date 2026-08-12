@@ -26,9 +26,10 @@
 <nav class="quote-progress" aria-label="Quote progress">
   <ol class="quote-progress__list">
     <li class="quote-progress__step" data-step-indicator="1"><span class="quote-progress__circle">1</span><span class="quote-progress__label">Route</span></li>
-    <li class="quote-progress__step" data-step-indicator="2"><span class="quote-progress__circle">2</span><span class="quote-progress__label">Move Details</span></li>
-    <li class="quote-progress__step" data-step-indicator="3"><span class="quote-progress__circle">3</span><span class="quote-progress__label">Date &amp; Phone</span></li>
-    <li class="quote-progress__step" data-step-indicator="4"><span class="quote-progress__circle">4</span><span class="quote-progress__label">Your Quote</span></li>
+    <li class="quote-progress__step" data-step-indicator="2"><span class="quote-progress__circle">2</span><span class="quote-progress__label">Belongings</span></li>
+    <li class="quote-progress__step" data-step-indicator="3"><span class="quote-progress__circle">3</span><span class="quote-progress__label">Access</span></li>
+    <li class="quote-progress__step" data-step-indicator="4"><span class="quote-progress__circle">4</span><span class="quote-progress__label">Date &amp; Phone</span></li>
+    <li class="quote-progress__step" data-step-indicator="5"><span class="quote-progress__circle">5</span><span class="quote-progress__label">Your Quote</span></li>
   </ol>
 </nav>
 
@@ -66,18 +67,10 @@
     <p class="quote-zone-status" id="zoneStatus" role="status" aria-live="polite"></p>
   </section>
 
-  <!-- ============ STEP 2: MOVE DETAILS ============ -->
+  <!-- ============ STEP 2: BELONGINGS ============ -->
   <section class="quote-step" data-step="2" hidden>
-    <h2 class="quote-step__title">Tell us about the move</h2>
-
-    <div class="quote-field">
-      <label>Size</label>
-      <div class="quote-radio-cards" data-field="size">
-        <button type="button" class="quote-radio-card" data-value="room_only">Room only<span class="quote-radio-card__price" data-price="room_only"></span></button>
-        <button type="button" class="quote-radio-card" data-value="room_furniture">Room + furniture<span class="quote-radio-card__price" data-price="room_furniture"></span></button>
-        <button type="button" class="quote-radio-card" data-value="full_apartment">Full apartment / shared house<span class="quote-radio-card__price" data-price="full_apartment"></span></button>
-      </div>
-    </div>
+    <h2 class="quote-step__title">What are you moving?</h2>
+    <p class="quote-step__hint">Tell us what you've got — we'll work out the right vehicle and price from it, not the other way around.</p>
 
     <div class="quote-field">
       <label>Package</label>
@@ -95,13 +88,25 @@
     </div>
 
     <div class="quote-field">
-      <label>Vehicle</label>
-      <div class="quote-radio-cards" data-field="vehicleType">
-        <button type="button" class="quote-radio-card" data-value="bakkie">Bakkie</button>
-        <button type="button" class="quote-radio-card" data-value="small_truck">Small truck<span class="quote-radio-card__price" data-price="small_truck"></span></button>
-      </div>
-      <p class="quote-field__note" id="vehicleNote"></p>
+      <label>Bedroom</label>
+      <div class="quote-item-list" id="itemsBedroom"></div>
     </div>
+    <div class="quote-field">
+      <label>Kitchen &amp; appliances</label>
+      <div class="quote-item-list" id="itemsKitchen"></div>
+    </div>
+    <div class="quote-field">
+      <label>Other</label>
+      <div class="quote-item-list" id="itemsOther"></div>
+    </div>
+
+    <p class="quote-volume-note" id="volumeNote"></p>
+  </section>
+
+  <!-- ============ STEP 3: ACCESS ============ -->
+  <section class="quote-step" data-step="3" hidden>
+    <h2 class="quote-step__title">Access at both ends</h2>
+    <p class="quote-step__hint">A 6th floor with a working lift is often easier than a 2nd floor walk-up — so we price the actual difficulty, not just the floor number.</p>
 
     <div class="quote-field quote-field--row">
       <div>
@@ -111,12 +116,24 @@
           <option value="1">1st</option>
           <option value="2">2nd</option>
           <option value="3">3rd</option>
-          <option value="4">4th+</option>
+          <option value="4">4th</option>
+          <option value="5">5th</option>
+          <option value="6">6th</option>
+          <option value="7">7th+</option>
         </select>
       </div>
       <div class="quote-toggle-field">
         <label for="liftToggle">Is there a lift?</label>
         <input type="checkbox" id="liftToggle">
+      </div>
+    </div>
+
+    <div class="quote-field">
+      <label>Carry distance from parking to the door</label>
+      <div class="quote-radio-cards" data-field="carryDistance">
+        <button type="button" class="quote-radio-card" data-value="close">Right outside</button>
+        <button type="button" class="quote-radio-card" data-value="moderate">Short walk (~20–50m)</button>
+        <button type="button" class="quote-radio-card" data-value="far">Far (50m+)</button>
       </div>
     </div>
 
@@ -135,8 +152,8 @@
     </div>
   </section>
 
-  <!-- ============ STEP 3: DATE & PHONE ============ -->
-  <section class="quote-step" data-step="3" hidden>
+  <!-- ============ STEP 4: DATE & PHONE ============ -->
+  <section class="quote-step" data-step="4" hidden>
     <h2 class="quote-step__title">When's the move?</h2>
     <p class="quote-step__hint">Same-day and next-day bookings are fine — a rush fee applies for short notice.</p>
 
@@ -159,21 +176,28 @@
     </div>
   </section>
 
-  <!-- ============ STEP 4: YOUR QUOTE ============ -->
-  <section class="quote-step" data-step="4" hidden>
+  <!-- ============ STEP 5: YOUR QUOTE ============ -->
+  <section class="quote-step" data-step="5" hidden>
     <h2 class="quote-step__title">Your quote</h2>
 
     <div class="quote-receipt" id="quoteReceipt">
       <div class="quote-receipt__loading" id="quoteLoading">Calculating…</div>
     </div>
 
-    <p class="quote-disclosure">The deposit shown below is <strong>non-refundable</strong> and confirms your booking slot. The balance is settled with the team on move day.</p>
+    <div class="quote-manual-quote" id="manualQuoteNotice" hidden>
+      <p id="manualQuoteText"></p>
+      <a class="quote-btn quote-btn--filled" id="manualQuoteWhatsapp" href="#" target="_blank" rel="noopener">Message us on WhatsApp</a>
+    </div>
 
-    <div class="quote-checkout" id="quoteCheckout">
-      <div id="googleSignInDiv"></div>
-      <p class="quote-checkout__signed-in" id="signedInStatus" hidden></p>
-      <button type="button" class="quote-pay-btn" id="payDepositBtn" disabled>Sign in with Google to Pay Deposit</button>
-      <a class="quote-whatsapp-fallback" id="whatsappFallback" href="#" target="_blank" rel="noopener">Message us on WhatsApp instead</a>
+    <div id="quotePriceSection">
+      <p class="quote-disclosure">The deposit below is <strong>non-refundable</strong> and confirms your booking slot; the balance is settled with the team on move day. The final price may change if the actual items or access conditions differ materially from what you told us.</p>
+
+      <div class="quote-checkout" id="quoteCheckout">
+        <div id="googleSignInDiv"></div>
+        <p class="quote-checkout__signed-in" id="signedInStatus" hidden></p>
+        <button type="button" class="quote-pay-btn" id="payDepositBtn" disabled>Sign in with Google to Pay Deposit</button>
+        <a class="quote-whatsapp-fallback" id="whatsappFallback" href="#" target="_blank" rel="noopener">Message us on WhatsApp instead</a>
+      </div>
     </div>
   </section>
 

@@ -196,6 +196,78 @@
 }
 .quote-field__other { margin-top: 10px; }
 
+/* ---- Item quantity list (belongings step) ---- */
+.quote-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.quote-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+.quote-item-row__label { font-size: .88rem; font-weight: 600; color: var(--ink); }
+.quote-item-row[data-qty="0"] .quote-item-row__label { color: var(--ink-soft); font-weight: 500; }
+.quote-item-row__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.quote-item-row__btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--panel);
+  color: var(--navy-deep);
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease;
+}
+.quote-item-row__btn:hover:not(:disabled) { background: var(--teal); color: #fff; }
+.quote-item-row__btn:disabled { opacity: .35; cursor: not-allowed; }
+.quote-item-row__qty {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  min-width: 1.5ch;
+  text-align: center;
+}
+
+.quote-volume-note {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--teal-deep);
+  margin: 10px 0 0;
+  min-height: 1.2em;
+}
+
+/* ---- Manual-quote branch (Step 5) ---- */
+.quote-manual-quote {
+  background: #fff;
+  border: 2px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.quote-manual-quote p {
+  color: var(--ink);
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+.quote-manual-quote .quote-btn { flex: none; padding: 12px 24px; }
+
 .quote-toggle-field {
   display: flex;
   align-items: center;

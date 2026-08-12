@@ -1,16 +1,16 @@
 (() => {
   const CFG = window.FOQ_CONFIG;
+  const TOTAL_STEPS = 5;
 
   const state = {
     step: 1,
     pickup: '',
     dropoff: '',
-    size: null,
     packageTier: null,
-    vehicleType: null,
-    vehicleAuto: true,
+    items: {},
     floorNumber: 0,
     hasLift: false,
+    carryDistance: null,
     packagingMaterials: false,
     packagingLabor: false,
     crewAdjustment: 0,
@@ -41,6 +41,10 @@
     pickupOther: $('#pickupOther'),
     dropoffInput: $('#dropoffInput'),
     zoneStatus: $('#zoneStatus'),
+    itemsBedroom: $('#itemsBedroom'),
+    itemsKitchen: $('#itemsKitchen'),
+    itemsOther: $('#itemsOther'),
+    volumeNote: $('#volumeNote'),
     floorSelect: $('#floorSelect'),
     liftToggle: $('#liftToggle'),
     packagingMaterials: $('#packagingMaterials'),
@@ -51,10 +55,13 @@
     crewPlus: $('#crewPlus'),
     crewValue: $('#crewValue'),
     crewNote: $('#crewNote'),
-    vehicleNote: $('#vehicleNote'),
     moveDate: $('#moveDate'),
     phoneInput: $('#phoneInput'),
     quoteReceipt: $('#quoteReceipt'),
+    manualQuoteNotice: $('#manualQuoteNotice'),
+    manualQuoteText: $('#manualQuoteText'),
+    manualQuoteWhatsapp: $('#manualQuoteWhatsapp'),
+    quotePriceSection: $('#quotePriceSection'),
     googleSignInDiv: $('#googleSignInDiv'),
     signedInStatus: $('#signedInStatus'),
     payDepositBtn: $('#payDepositBtn'),
@@ -64,7 +71,8 @@
   };
 
   const STANDARD_CREW = { basic: 1, mid: 2, premium: 3 };
-  const AUTO_VEHICLE = { room_only: 'bakkie', room_furniture: 'bakkie', full_apartment: 'small_truck' };
+  const MAX_CREW = 6;
+  const GROUP_CONTAINERS = { bedroom: els.itemsBedroom, kitchen: els.itemsKitchen, other: els.itemsOther };
 
   const todayISO = () => new Date().toISOString().slice(0, 10);
   els.moveDate.min = todayISO();
@@ -97,16 +105,21 @@
     renderProgress();
     els.stickyTotal.hidden = n < 2;
     els.backBtn.disabled = n === 1;
-    els.nextBtn.textContent = n === 4 ? 'Done' : 'Next';
-    els.nextBtn.style.display = n === 4 ? 'none' : '';
-    els.backBtn.style.display = n === 4 ? 'none' : '';
-    if (n === 4) fetchQuotePreview();
+    els.nextBtn.textContent = n === TOTAL_STEPS ? 'Done' : 'Next';
+    els.nextBtn.style.display = n === TOTAL_STEPS ? 'none' : '';
+    els.backBtn.style.display = n === TOTAL_STEPS ? 'none' : '';
+    if (n === TOTAL_STEPS) fetchQuotePreview();
+  }
+
+  function totalItemCount() {
+    return Object.values(state.items).reduce((sum, qty) => sum + qty, 0);
   }
 
   function validateStep(n) {
     if (n === 1) return state.inZone === true;
-    if (n === 2) return state.size && state.packageTier && state.vehicleType;
-    if (n === 3) return state.moveDate && state.timeSlot && state.phone.trim().length >= 7;
+    if (n === 2) return state.packageTier && totalItemCount() > 0;
+    if (n === 3) return !!state.carryDistance;
+    if (n === 4) return state.moveDate && state.timeSlot && state.phone.trim().length >= 7;
     return true;
   }
 
@@ -129,10 +142,13 @@
       }
       els.zoneStatus.setAttribute('data-state', 'error');
     }
-    if (n === 2 && (!state.size || !state.packageTier || !state.vehicleType)) {
-      showStepError('Pick a size, package and vehicle before continuing.');
+    if (n === 2 && !(state.packageTier && totalItemCount() > 0)) {
+      showStepError('Pick a package and add at least one item before continuing.');
     }
-    if (n === 3 && !(state.moveDate && state.timeSlot && state.phone.trim().length >= 7)) {
+    if (n === 3 && !state.carryDistance) {
+      showStepError('Tell us the carry distance from parking to the door before continuing.');
+    }
+    if (n === 4 && !(state.moveDate && state.timeSlot && state.phone.trim().length >= 7)) {
       showStepError('Add a move date, time slot and a valid phone number before continuing.');
     }
   }
@@ -142,7 +158,7 @@
       explainBlockedStep(state.step);
       return;
     }
-    if (state.step < 4) {
+    if (state.step < TOTAL_STEPS) {
       state.step += 1;
       showStep(state.step);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -212,7 +228,7 @@
   }
 
   /* ---------------------------------------------------------------- */
-  /* Step 2: Move details                                              */
+  /* Step 2: Belongings (package + itemized inventory)                 */
   /* ---------------------------------------------------------------- */
 
   function wireRadioCards(field, onChange) {
@@ -230,19 +246,6 @@
     });
   }
 
-  wireRadioCards('size', (size) => {
-    state.standardCrew = STANDARD_CREW[state.packageTier] || 2;
-    if (state.vehicleAuto) {
-      const suggested = AUTO_VEHICLE[size];
-      const group = $('.quote-radio-cards[data-field="vehicleType"]');
-      group.querySelectorAll('.quote-radio-card').forEach((b) => {
-        b.setAttribute('aria-pressed', b.dataset.value === suggested ? 'true' : 'false');
-      });
-      state.vehicleType = suggested;
-      els.vehicleNote.textContent = 'Suggested for this size — pick the other option to switch.';
-    }
-  });
-
   wireRadioCards('packageTier', (tier) => {
     state.standardCrew = STANDARD_CREW[tier] || 2;
     state.crewAdjustment = 0;
@@ -250,12 +253,69 @@
     updateCrewNote();
   });
 
-  wireRadioCards('vehicleType', () => {
-    state.vehicleAuto = false;
-    els.vehicleNote.textContent = '';
-  });
+  wireRadioCards('carryDistance');
 
-  wireRadioCards('timeSlot');
+  function renderItemCatalog() {
+    const catalog = state.pricingConfig?.itemCatalog;
+    if (!catalog) return;
+
+    Object.values(GROUP_CONTAINERS).forEach((el) => { el.innerHTML = ''; });
+
+    Object.entries(catalog).forEach(([key, def]) => {
+      const container = GROUP_CONTAINERS[def.group] || els.itemsOther;
+      const row = document.createElement('div');
+      row.className = 'quote-item-row';
+      row.dataset.qty = '0';
+      row.innerHTML = `
+        <span class="quote-item-row__label">${def.label}</span>
+        <span class="quote-item-row__stepper">
+          <button type="button" class="quote-item-row__btn" data-action="minus" aria-label="Fewer ${def.label}">−</button>
+          <span class="quote-item-row__qty">0</span>
+          <button type="button" class="quote-item-row__btn" data-action="plus" aria-label="More ${def.label}">+</button>
+        </span>
+      `;
+      const qtyEl = row.querySelector('.quote-item-row__qty');
+      const minusBtn = row.querySelector('[data-action="minus"]');
+      const plusBtn = row.querySelector('[data-action="plus"]');
+
+      const setQty = (qty) => {
+        qty = Math.max(0, Math.min(20, qty));
+        if (qty > 0) state.items[key] = qty; else delete state.items[key];
+        qtyEl.textContent = qty;
+        row.dataset.qty = String(qty);
+        minusBtn.disabled = qty <= 0;
+        updateVolumeNote();
+        refreshLiveTotal();
+      };
+
+      minusBtn.addEventListener('click', () => setQty((state.items[key] || 0) - 1));
+      plusBtn.addEventListener('click', () => setQty((state.items[key] || 0) + 1));
+      minusBtn.disabled = true;
+
+      container.appendChild(row);
+    });
+  }
+
+  function updateVolumeNote() {
+    const catalog = state.pricingConfig?.itemCatalog;
+    if (!catalog) {
+      els.volumeNote.textContent = '';
+      return;
+    }
+    const count = totalItemCount();
+    if (count === 0) {
+      els.volumeNote.textContent = '';
+      return;
+    }
+    const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
+    const threshold = state.pricingConfig.vehicleVolumeThreshold || 12;
+    const vehicle = volume > threshold ? 'a small truck' : 'a bakkie';
+    els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${vehicle} will do it.`;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Step 3: Access                                                    */
+  /* ---------------------------------------------------------------- */
 
   els.floorSelect.addEventListener('change', () => {
     state.floorNumber = Number(els.floorSelect.value);
@@ -274,7 +334,6 @@
     refreshLiveTotal();
   });
 
-  const MAX_CREW = 6;
   function updateCrewButtons() {
     const count = Math.max(1, Math.min(MAX_CREW, state.standardCrew + state.crewAdjustment));
     els.crewValue.textContent = count;
@@ -310,7 +369,7 @@
 
   let liveTotalTimer = null;
   function refreshLiveTotal() {
-    if (state.step < 2 || !state.pickup || !state.dropoff || !state.size || !state.packageTier) return;
+    if (state.step < 2 || !state.pickup || !state.dropoff || !state.packageTier || totalItemCount() === 0) return;
     clearTimeout(liveTotalTimer);
     liveTotalTimer = setTimeout(fetchQuotePreview, 350);
   }
@@ -319,11 +378,11 @@
     return {
       pickup: state.pickup,
       dropoff: state.dropoff,
-      size: state.size,
       packageTier: state.packageTier,
-      vehicleType: state.vehicleType,
+      items: state.items,
       floorNumber: state.floorNumber,
       hasLift: state.hasLift,
+      carryDistance: state.carryDistance || 'close',
       packagingMaterials: state.packagingMaterials,
       packagingLabor: state.packagingLabor,
       crewAdjustment: state.crewAdjustment,
@@ -332,7 +391,7 @@
   }
 
   async function fetchQuotePreview() {
-    if (!state.size || !state.packageTier || !state.vehicleType) return;
+    if (!state.packageTier || totalItemCount() === 0) return;
     try {
       const res = await fetch(`${CFG.apiBase}/quote-preview`, {
         method: 'POST',
@@ -343,8 +402,12 @@
       if (!res.ok || data.inZone === false) return;
 
       state.lastQuote = data;
-      els.stickyTotalValue.textContent = `R${Math.round(data.finalPrice)}`;
-      if (state.step === 4) renderReceipt(data);
+      if (!data.requiresManualQuote) {
+        els.stickyTotalValue.textContent = `R${Math.round(data.finalPrice)}`;
+      } else {
+        els.stickyTotalValue.textContent = 'Custom quote';
+      }
+      if (state.step === TOTAL_STEPS) renderReceipt(data);
     } catch (err) {
       /* silent — live total is a nice-to-have, not blocking */
     }
@@ -355,9 +418,10 @@
       const res = await fetch(`${CFG.apiBase}/pricing-config`);
       if (!res.ok) return;
       state.pricingConfig = await res.json();
+      renderItemCatalog();
       applyPricingHints();
     } catch (err) {
-      /* fee hints are a nice-to-have; the real price still comes from /quote-preview */
+      /* fee hints/inventory list need this; retry isn't critical enough to loop on */
     }
   }
 
@@ -367,10 +431,7 @@
 
     $$('.quote-radio-card__price').forEach((el) => {
       const key = el.dataset.price;
-      let amount = null;
-      if (key in cfg.sizeFee) amount = cfg.sizeFee[key];
-      else if (key in cfg.packageFee) amount = cfg.packageFee[key];
-      else if (key === 'small_truck') amount = cfg.vehicleUpgradeFee;
+      const amount = cfg.packageFee[key];
       el.textContent = amount ? `+R${amount}` : 'included';
     });
 
@@ -380,10 +441,21 @@
   }
 
   function renderReceipt(data) {
+    if (data.requiresManualQuote) {
+      els.manualQuoteText.textContent = data.reason || "This one needs a proper look before we can price it.";
+      els.manualQuoteNotice.hidden = false;
+      els.quotePriceSection.hidden = true;
+      return;
+    }
+    els.manualQuoteNotice.hidden = true;
+    els.quotePriceSection.hidden = false;
+
+    const vehicleLabel = data.vehicleType === 'small_truck' ? 'Small truck' : 'Bakkie';
     const rows = data.items.map((item) =>
       `<div class="quote-receipt__row"><span>${item.label}</span><span>R${Math.round(item.amount)}</span></div>`
     ).join('');
     els.quoteReceipt.innerHTML = `
+      <div class="quote-receipt__row"><span>Vehicle</span><span>${vehicleLabel}</span></div>
       ${rows}
       <div class="quote-receipt__total"><span>Total</span><span>R${Math.round(data.finalPrice)}</span></div>
       <div class="quote-receipt__deposit"><span>Deposit due now</span><span>R${Math.round(data.depositAmount)}</span></div>
@@ -458,7 +530,13 @@
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Could not create booking');
+      if (!res.ok) {
+        if (data.requiresManualQuote) {
+          renderReceipt(data);
+          return;
+        }
+        throw new Error(data.message || 'Could not create booking');
+      }
 
       submitToPayfast(data.payfast);
     } catch (err) {
@@ -487,11 +565,15 @@
   /* WhatsApp fallback                                                  */
   /* ---------------------------------------------------------------- */
 
-  function updateWhatsappFallback() {
-    const msg = encodeURIComponent(
+  function whatsappMessage() {
+    return encodeURIComponent(
       `Hi, I'd like to book a Hatfield relocation. Pickup: ${state.pickup || '?'}, Drop-off: ${state.dropoff || '?'}, Date: ${state.moveDate || '?'}`
     );
-    els.whatsappFallback.href = `https://wa.me/${CFG.whatsappNumber}?text=${msg}`;
+  }
+  function updateWhatsappFallback() {
+    const url = `https://wa.me/${CFG.whatsappNumber}?text=${whatsappMessage()}`;
+    els.whatsappFallback.href = url;
+    els.manualQuoteWhatsapp.href = url;
   }
 
   /* ---------------------------------------------------------------- */
@@ -578,6 +660,7 @@
     if (handledReturn) return;
 
     showStep(1);
+    updateWhatsappFallback();
     setInterval(updateWhatsappFallback, 1000);
     loadPricingConfig();
 
