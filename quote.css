@@ -1,0 +1,519 @@
+/* ============ Quote wizard — utilitarian checkout, same tokens as the main site ============ */
+
+.quote-body {
+  background: var(--panel);
+  padding-bottom: 180px;
+}
+
+/* ---- Header ---- */
+.quote-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--navy-deep);
+  color: #fff;
+}
+.quote-header__back {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+}
+.quote-header__back:hover { background: rgba(255,255,255,.1); }
+.quote-header__back svg { width: 20px; height: 20px; }
+.quote-header__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  flex: 1;
+  text-align: center;
+}
+.quote-header__spacer { width: 32px; }
+
+/* ---- Progress / step indicator ---- */
+.quote-progress {
+  background: var(--navy-deep);
+  padding: 0 20px 20px;
+}
+.quote-progress__list {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  max-width: 520px;
+  margin-inline: auto;
+}
+.quote-progress__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  text-align: center;
+}
+.quote-progress__step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,.2);
+  z-index: 0;
+}
+.quote-progress__step[data-complete]:not(:last-child)::after,
+.quote-progress__step[data-active]:not(:last-child)::after {
+  background: var(--gold);
+}
+.quote-progress__circle {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .85rem;
+  background: rgba(255,255,255,.15);
+  color: rgba(255,255,255,.6);
+}
+.quote-progress__step[data-active] .quote-progress__circle {
+  background: var(--teal);
+  color: #fff;
+}
+.quote-progress__step[data-complete] .quote-progress__circle {
+  background: var(--gold);
+  color: var(--navy-deep);
+}
+.quote-progress__label {
+  margin-top: 6px;
+  font-size: .68rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.55);
+  max-width: 80px;
+}
+.quote-progress__step[data-active] .quote-progress__label,
+.quote-progress__step[data-complete] .quote-progress__label {
+  color: #fff;
+}
+
+/* ---- Main / steps ---- */
+.quote-main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 20px 20px;
+}
+.quote-step--entering { animation: quote-step-in .35s cubic-bezier(.16,1,.3,1); }
+@keyframes quote-step-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quote-step-error {
+  position: fixed;
+  bottom: 130px;
+  left: 20px;
+  right: 20px;
+  z-index: 16;
+  background: #b3261e;
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 28px -10px rgba(179,38,30,.5);
+}
+@media (min-width: 640px) {
+  .quote-step-error {
+    max-width: 520px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+.quote-step__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--navy-deep);
+  margin: 0 0 6px;
+}
+.quote-step__hint {
+  color: var(--ink-soft);
+  font-size: .92rem;
+  margin: 0 0 20px;
+}
+
+.quote-field {
+  margin-bottom: 20px;
+}
+.quote-field > label {
+  display: block;
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--navy-deep);
+  margin-bottom: 8px;
+}
+.quote-field__note {
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-size: .78rem;
+}
+.quote-field--row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+.quote-field--row > div { flex: 1; }
+
+.quote-field select,
+.quote-field input[type="text"],
+.quote-field input[type="tel"],
+.quote-field input[type="date"] {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.quote-field select:focus,
+.quote-field input:focus {
+  border-color: var(--teal);
+  outline: none;
+}
+.quote-field__other { margin-top: 10px; }
+
+.quote-toggle-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 14px;
+}
+.quote-toggle-field label {
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--navy-deep);
+}
+.quote-toggle-field input { width: 22px; height: 22px; accent-color: var(--teal); }
+
+.quote-zone-status {
+  font-size: .88rem;
+  font-weight: 600;
+  margin: 4px 0 0;
+  min-height: 1.2em;
+}
+.quote-zone-status[data-state="ok"] { color: var(--teal-deep); }
+.quote-zone-status[data-state="error"] { color: #b3261e; }
+
+/* ---- Radio cards (size/tier/vehicle/time slot) ---- */
+.quote-radio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+.quote-radio-card {
+  position: relative;
+  border: 2px solid var(--line);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 14px 56px 14px 16px;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 48px;
+  justify-content: center;
+  transition: border-color .2s ease, background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+.quote-radio-card:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -12px rgba(11,35,64,.3);
+}
+.quote-radio-card:active { transform: translateY(0); }
+.quote-radio-card span {
+  font-weight: 400;
+  font-size: .78rem;
+  color: var(--ink-soft);
+}
+.quote-radio-card[aria-pressed="true"] {
+  border-color: var(--teal);
+  background: rgba(28,140,134,.06);
+  color: var(--teal-deep);
+}
+.quote-radio-card[aria-pressed="true"] strong { color: var(--teal-deep); }
+.quote-radio-card__price {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--gold-deep);
+}
+
+/* ---- Checkboxes ---- */
+.quote-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quote-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.quote-checkbox:hover { border-color: var(--teal); }
+.quote-checkbox:has(input:checked) {
+  border-color: var(--teal);
+  background: rgba(28,140,134,.06);
+}
+.quote-checkbox input { width: 20px; height: 20px; accent-color: var(--teal); }
+.quote-checkbox__fee {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--gold-deep);
+  font-size: .82rem;
+}
+
+/* ---- Stepper (crew size) ---- */
+.quote-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 20px;
+}
+.quote-stepper__btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--navy-deep);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease, transform .1s ease;
+}
+.quote-stepper__btn:hover:not(:disabled) { background: var(--teal); }
+.quote-stepper__btn:active:not(:disabled) { transform: scale(.92); }
+.quote-stepper__btn:disabled { opacity: .35; cursor: not-allowed; }
+.quote-stepper__value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  min-width: 1.5ch;
+  text-align: center;
+}
+
+/* ---- Receipt / itemized total ---- */
+.quote-receipt {
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.quote-receipt__loading { color: var(--ink-soft); font-size: .9rem; }
+.quote-receipt__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: .9rem;
+  border-bottom: 1px solid var(--line);
+}
+.quote-receipt__row:last-of-type { border-bottom: none; }
+.quote-receipt__total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid var(--navy-deep);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--navy-deep);
+}
+.quote-receipt__deposit {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+}
+.quote-receipt__balance {
+  display: flex;
+  justify-content: space-between;
+  font-size: .8rem;
+  color: var(--ink-soft);
+}
+
+.quote-disclosure {
+  font-size: .8rem;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+
+.quote-checkout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.quote-checkout__signed-in {
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--teal-deep);
+}
+.quote-pay-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--gold);
+  color: var(--navy-deep);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  transition: background .2s ease, transform .15s ease;
+}
+.quote-pay-btn:hover:not(:disabled) { background: var(--gold-bright); transform: translateY(-2px); }
+.quote-pay-btn:disabled { opacity: .5; cursor: not-allowed; }
+.quote-whatsapp-fallback {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--teal-deep);
+  text-decoration: underline;
+}
+.quote-whatsapp-fallback:hover { color: var(--teal); }
+
+/* ---- Confirmation ---- */
+.quote-confirmation {
+  text-align: center;
+  padding: 40px 20px;
+}
+.quote-confirmation__icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  animation: quote-confirm-in .5s cubic-bezier(.16,1,.3,1);
+}
+.quote-confirmation__icon svg { width: 32px; height: 32px; }
+@keyframes quote-confirm-in {
+  from { transform: scale(.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.quote-confirmation h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--navy-deep);
+  margin: 0 0 10px;
+}
+.quote-confirmation p {
+  color: var(--ink-soft);
+  max-width: 40ch;
+  margin: 0 auto 24px;
+}
+
+/* ---- Sticky total (steps 2-4) ---- */
+.quote-sticky-total {
+  position: fixed;
+  bottom: 76px;
+  left: 0;
+  right: 0;
+  background: var(--navy-deep);
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  z-index: 15;
+}
+.quote-sticky-total__label { font-size: .8rem; opacity: .7; }
+.quote-sticky-total__value { font-weight: 800; font-size: 1.1rem; color: var(--gold-bright); }
+
+/* ---- Bottom action bar ---- */
+.quote-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  padding: 12px 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 15;
+}
+.quote-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .95rem;
+  border: 2px solid var(--navy-deep);
+  transition: background .15s ease, color .15s ease, transform .1s ease;
+}
+.quote-btn--outline {
+  background: transparent;
+  color: var(--navy-deep);
+}
+.quote-btn--outline:hover:not(:disabled) { background: rgba(11,35,64,.06); }
+.quote-btn--filled {
+  background: var(--navy-deep);
+  color: #fff;
+}
+.quote-btn--filled:hover:not(:disabled) { background: var(--teal-deep); }
+.quote-btn:active:not(:disabled) { transform: scale(.97); }
+.quote-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+@media (min-width: 640px) {
+  .quote-bottom-bar,
+  .quote-sticky-total {
+    max-width: 560px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+}

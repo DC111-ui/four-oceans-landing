@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Your Quote — Four Oceans Group</title>
+<meta name="description" content="Instant, firm quote for Hatfield student relocations. Pay a deposit online to confirm your booking.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="quote.css">
+</head>
+<body class="quote-body">
+
+<header class="quote-header">
+  <a class="quote-header__back" href="index.html#services" aria-label="Back to Four Oceans Group site">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <span class="quote-header__title">Get Your Quote</span>
+  <span class="quote-header__spacer" aria-hidden="true"></span>
+</header>
+
+<nav class="quote-progress" aria-label="Quote progress">
+  <ol class="quote-progress__list">
+    <li class="quote-progress__step" data-step-indicator="1"><span class="quote-progress__circle">1</span><span class="quote-progress__label">Route</span></li>
+    <li class="quote-progress__step" data-step-indicator="2"><span class="quote-progress__circle">2</span><span class="quote-progress__label">Move Details</span></li>
+    <li class="quote-progress__step" data-step-indicator="3"><span class="quote-progress__circle">3</span><span class="quote-progress__label">Date &amp; Phone</span></li>
+    <li class="quote-progress__step" data-step-indicator="4"><span class="quote-progress__circle">4</span><span class="quote-progress__label">Your Quote</span></li>
+  </ol>
+</nav>
+
+<main class="quote-main">
+
+  <!-- ============ STEP 1: ROUTE ============ -->
+  <section class="quote-step" data-step="1">
+    <h2 class="quote-step__title">Where are you moving?</h2>
+    <p class="quote-step__hint">Hatfield student relocations only, for now — pickup and drop-off both need to be in the Hatfield/Brooklyn/Colbyn/Sunnyside/Arcadia/Menlo Park area.</p>
+
+    <div class="quote-field">
+      <label for="pickupSelect">Pickup residence</label>
+      <select id="pickupSelect">
+        <option value="">Select your residence…</option>
+        <option value="Boekenhout Residence, Hatfield, Pretoria">Boekenhout</option>
+        <option value="Curlewis Residence, Hatfield, Pretoria">Curlewis</option>
+        <option value="Erika Residence, Hatfield, Pretoria">Erika</option>
+        <option value="Jasmyn Residence, Hatfield, Pretoria">Jasmyn</option>
+        <option value="Katjiepiering Residence, Hatfield, Pretoria">Katjiepiering</option>
+        <option value="Magrietjie Residence, Hatfield, Pretoria">Magrietjie</option>
+        <option value="Mopanie Residence, Hatfield, Pretoria">Mopanie</option>
+        <option value="Nerina Residence, Hatfield, Pretoria">Nerina</option>
+        <option value="Olienhout Residence, Hatfield, Pretoria">Olienhout</option>
+        <option value="Tuks Village, Hatfield, Pretoria">Tuks Village</option>
+        <option value="__other__">Other Hatfield/Brooklyn-area address…</option>
+      </select>
+      <input type="text" id="pickupOther" class="quote-field__other" placeholder="Search your address…" style="display:none">
+    </div>
+
+    <div class="quote-field">
+      <label for="dropoffInput">Drop-off address</label>
+      <input type="text" id="dropoffInput" placeholder="Search address in Hatfield, Brooklyn, Colbyn, Sunnyside, Arcadia, Menlo Park…">
+    </div>
+
+    <p class="quote-zone-status" id="zoneStatus" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ============ STEP 2: MOVE DETAILS ============ -->
+  <section class="quote-step" data-step="2" hidden>
+    <h2 class="quote-step__title">Tell us about the move</h2>
+
+    <div class="quote-field">
+      <label>Size</label>
+      <div class="quote-radio-cards" data-field="size">
+        <button type="button" class="quote-radio-card" data-value="room_only">Room only<span class="quote-radio-card__price" data-price="room_only"></span></button>
+        <button type="button" class="quote-radio-card" data-value="room_furniture">Room + furniture<span class="quote-radio-card__price" data-price="room_furniture"></span></button>
+        <button type="button" class="quote-radio-card" data-value="full_apartment">Full apartment / shared house<span class="quote-radio-card__price" data-price="full_apartment"></span></button>
+      </div>
+    </div>
+
+    <div class="quote-field">
+      <label>Package</label>
+      <div class="quote-radio-cards quote-radio-cards--tier" data-field="packageTier">
+        <button type="button" class="quote-radio-card" data-value="basic">
+          <strong>Basic</strong><span>Transport only (bakkie service)</span><span class="quote-radio-card__price" data-price="basic"></span>
+        </button>
+        <button type="button" class="quote-radio-card" data-value="mid">
+          <strong>Mid</strong><span>Move-out assistance, boxes supplied, packing materials</span><span class="quote-radio-card__price" data-price="mid"></span>
+        </button>
+        <button type="button" class="quote-radio-card" data-value="premium">
+          <strong>Premium</strong><span>Packing, wrapping, carrying, transportation</span><span class="quote-radio-card__price" data-price="premium"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="quote-field">
+      <label>Vehicle</label>
+      <div class="quote-radio-cards" data-field="vehicleType">
+        <button type="button" class="quote-radio-card" data-value="bakkie">Bakkie</button>
+        <button type="button" class="quote-radio-card" data-value="small_truck">Small truck<span class="quote-radio-card__price" data-price="small_truck"></span></button>
+      </div>
+      <p class="quote-field__note" id="vehicleNote"></p>
+    </div>
+
+    <div class="quote-field quote-field--row">
+      <div>
+        <label for="floorSelect">Floor</label>
+        <select id="floorSelect">
+          <option value="0">Ground</option>
+          <option value="1">1st</option>
+          <option value="2">2nd</option>
+          <option value="3">3rd</option>
+          <option value="4">4th+</option>
+        </select>
+      </div>
+      <div class="quote-toggle-field">
+        <label for="liftToggle">Is there a lift?</label>
+        <input type="checkbox" id="liftToggle">
+      </div>
+    </div>
+
+    <div class="quote-field quote-checkbox-list">
+      <label class="quote-checkbox"><input type="checkbox" id="packagingMaterials"> I need packing materials (boxes/wrap) <span class="quote-checkbox__fee" id="materialsFee"></span></label>
+      <label class="quote-checkbox"><input type="checkbox" id="packagingLabor"> I need someone to pack for me <span class="quote-checkbox__fee" id="laborFee"></span></label>
+    </div>
+
+    <div class="quote-field">
+      <label>Crew size <span class="quote-field__note" id="crewNote"></span></label>
+      <div class="quote-stepper">
+        <button type="button" class="quote-stepper__btn" id="crewMinus" aria-label="Fewer movers">−</button>
+        <span class="quote-stepper__value" id="crewValue">2</span>
+        <button type="button" class="quote-stepper__btn" id="crewPlus" aria-label="More movers">+</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3: DATE & PHONE ============ -->
+  <section class="quote-step" data-step="3" hidden>
+    <h2 class="quote-step__title">When's the move?</h2>
+    <p class="quote-step__hint">Same-day and next-day bookings are fine — a rush fee applies for short notice.</p>
+
+    <div class="quote-field">
+      <label for="moveDate">Move date</label>
+      <input type="date" id="moveDate">
+    </div>
+
+    <div class="quote-field">
+      <label>Time slot</label>
+      <div class="quote-radio-cards" data-field="timeSlot">
+        <button type="button" class="quote-radio-card" data-value="Morning">Morning</button>
+        <button type="button" class="quote-radio-card" data-value="Afternoon">Afternoon</button>
+      </div>
+    </div>
+
+    <div class="quote-field">
+      <label for="phoneInput">Phone number</label>
+      <input type="tel" id="phoneInput" placeholder="+27 …" autocomplete="tel">
+    </div>
+  </section>
+
+  <!-- ============ STEP 4: YOUR QUOTE ============ -->
+  <section class="quote-step" data-step="4" hidden>
+    <h2 class="quote-step__title">Your quote</h2>
+
+    <div class="quote-receipt" id="quoteReceipt">
+      <div class="quote-receipt__loading" id="quoteLoading">Calculating…</div>
+    </div>
+
+    <p class="quote-disclosure">The deposit shown below is <strong>non-refundable</strong> and confirms your booking slot. The balance is settled with the team on move day.</p>
+
+    <div class="quote-checkout" id="quoteCheckout">
+      <div id="googleSignInDiv"></div>
+      <p class="quote-checkout__signed-in" id="signedInStatus" hidden></p>
+      <button type="button" class="quote-pay-btn" id="payDepositBtn" disabled>Sign in with Google to Pay Deposit</button>
+      <a class="quote-whatsapp-fallback" id="whatsappFallback" href="#" target="_blank" rel="noopener">Message us on WhatsApp instead</a>
+    </div>
+  </section>
+
+  <!-- ============ CONFIRMATION ============ -->
+  <section class="quote-step quote-step--confirmation" data-step="confirmation" hidden>
+    <div class="quote-confirmation">
+      <div class="quote-confirmation__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>Booking Confirmed</h2>
+      <p id="confirmationText">Your deposit has been received and your move is booked. We'll be in touch to confirm the details.</p>
+      <div class="quote-confirmation__actions">
+        <a class="btn btn--gold btn--lg" href="index.html">Back to Home</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<p class="quote-step-error" id="stepError" role="alert" hidden></p>
+
+<div class="quote-sticky-total" id="stickyTotal" hidden>
+  <span class="quote-sticky-total__label">Total</span>
+  <span class="quote-sticky-total__value" id="stickyTotalValue">R0</span>
+</div>
+
+<div class="quote-bottom-bar">
+  <button type="button" class="quote-btn quote-btn--outline" id="backBtn">Back</button>
+  <button type="button" class="quote-btn quote-btn--filled" id="nextBtn">Next</button>
+</div>
+
+<script>window.FOQ_CONFIG = {
+  apiBase: 'https://shop.darlingtonchanakira.com/wp-json/four-oceans/v1',
+  googleMapsApiKey: 'AIzaSyDfUfu0EJ0ovJ8ncr3nERWF2LQLjsCRQ1U',
+  googleOAuthClientId: '204916505546-2ofvnn0ftu03aqjnc14tlii29c2431cs.apps.googleusercontent.com',
+  whatsappNumber: '27617037902'
+};</script>
+<script src="quote.js"></script>
+</body>
+</html>
