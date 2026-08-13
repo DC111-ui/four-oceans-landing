@@ -718,6 +718,23 @@
   max-width: 40ch;
   margin: 0 auto 24px;
 }
+.quote-confirmation__bank {
+  text-align: left;
+  margin: 0 auto 20px;
+}
+.quote-confirmation__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.quote-confirmation__actions .quote-btn {
+  flex: none;
+  width: 100%;
+}
+.quote-confirmation__home {
+  margin-top: 8px;
+}
 
 /* ---- Sticky total ---- */
 .quote-sticky-total {
@@ -742,12 +759,16 @@
 
 .quote-btn {
   flex: 1;
+  display: inline-block;
   padding: 14px;
   border-radius: var(--radius);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: .95rem;
+  text-align: center;
+  text-decoration: none;
   border: 2px solid var(--navy-deep);
+  cursor: pointer;
   transition: background .15s ease, color .15s ease, transform .1s ease;
 }
 .quote-btn--filled {
@@ -755,6 +776,18 @@
   color: #fff;
 }
 .quote-btn--filled:hover:not(:disabled) { background: var(--teal-deep); }
+.quote-btn--ghost {
+  background: transparent;
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+.quote-btn--ghost:hover:not(:disabled) { background: rgba(28,140,134,.08); }
+.quote-btn--whatsapp {
+  background: #25D366;
+  border-color: #25D366;
+  color: #fff;
+}
+.quote-btn--whatsapp:hover:not(:disabled) { background: #1DA851; border-color: #1DA851; }
 .quote-btn:active:not(:disabled) { transform: scale(.97); }
 .quote-btn:disabled { opacity: .4; cursor: not-allowed; }
 

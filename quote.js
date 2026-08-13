@@ -19,6 +19,8 @@
     moveDate: '',
     timeSlot: null,
     phone: '',
+    customerName: '',
+    customerEmail: '',
     gitCoverRequested: false,
     goodsValue: 0,
     inZone: null,
@@ -27,8 +29,7 @@
     pricingConfig: null,
     calViewYear: new Date().getFullYear(),
     calViewMonth: new Date().getMonth(),
-    sessionToken: localStorage.getItem('foq_session_token') || null,
-    sessionName: localStorage.getItem('foq_session_name') || null,
+    acceptedReferenceId: null,
   };
 
   const $ = (sel) => document.querySelector(sel);
@@ -86,6 +87,8 @@
     calMonthLabel: $('#calMonthLabel'),
     calGrid: $('#calGrid'),
     phoneInput: $('#phoneInput'),
+    customerNameInput: $('#customerNameInput'),
+    customerEmailInput: $('#customerEmailInput'),
     gitCoverToggle: $('#gitCoverToggle'),
     gitCoverDetail: $('#gitCoverDetail'),
     goodsValueInput: $('#goodsValueInput'),
@@ -94,11 +97,14 @@
     manualQuoteText: $('#manualQuoteText'),
     manualQuoteWhatsapp: $('#manualQuoteWhatsapp'),
     quotePriceSection: $('#quotePriceSection'),
-    googleSignInDiv: $('#googleSignInDiv'),
-    signedInStatus: $('#signedInStatus'),
-    payDepositBtn: $('#payDepositBtn'),
+    acceptQuoteBtn: $('#acceptQuoteBtn'),
     whatsappFallback: $('#whatsappFallback'),
     confirmationText: $('#confirmationText'),
+    confirmationBank: $('#confirmationBank'),
+    invoiceLink: $('#invoiceLink'),
+    emailInvoiceBtn: $('#emailInvoiceBtn'),
+    emailInvoiceStatus: $('#emailInvoiceStatus'),
+    confirmationWhatsapp: $('#confirmationWhatsapp'),
     formError: $('#formError'),
   };
 
@@ -438,6 +444,8 @@
   wireRadioCards('timeSlot');
 
   els.phoneInput.addEventListener('input', () => { state.phone = els.phoneInput.value; });
+  els.customerNameInput.addEventListener('input', () => { state.customerName = els.customerNameInput.value; });
+  els.customerEmailInput.addEventListener('input', () => { state.customerEmail = els.customerEmailInput.value; });
 
   function formatDateLabel(iso) {
     const d = new Date(`${iso}T00:00:00`);
@@ -651,81 +659,36 @@
     if (!state.vehicleType) missing.push('a truck (pick one, or use the load assistant)');
     if (!state.moveDate) missing.push('a move date');
     if (!state.timeSlot) missing.push('a time slot');
+    if (!state.customerName || state.customerName.trim().length < 2) missing.push('your full name');
+    if (!state.customerEmail || !/\S+@\S+\.\S+/.test(state.customerEmail)) missing.push('a valid email address');
     if (!state.phone || state.phone.trim().length < 7) missing.push('a valid phone number');
     return missing;
   }
 
   /* ---------------------------------------------------------------- */
-  /* Google Sign-In (checkout gate)                                    */
+  /* Accept quote (no sign-in — name/email captured directly)          */
   /* ---------------------------------------------------------------- */
 
-  function updateCheckoutUI() {
-    if (state.sessionToken) {
-      els.googleSignInDiv.hidden = true;
-      els.signedInStatus.hidden = false;
-      els.signedInStatus.textContent = `Signed in as ${state.sessionName || 'you'}`;
-      els.payDepositBtn.disabled = false;
-      els.payDepositBtn.textContent = 'Pay Deposit with PayFast';
-    } else {
-      els.googleSignInDiv.hidden = false;
-      els.signedInStatus.hidden = true;
-      els.payDepositBtn.disabled = true;
-      els.payDepositBtn.textContent = 'Sign in with Google to Pay Deposit';
-    }
-  }
-
-  async function handleGoogleCredential(response) {
-    try {
-      const res = await fetch(`${CFG.apiBase}/auth/google`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: response.credential }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Sign-in failed');
-
-      state.sessionToken = data.sessionToken;
-      state.sessionName = data.name;
-      localStorage.setItem('foq_session_token', data.sessionToken);
-      localStorage.setItem('foq_session_name', data.name);
-      updateCheckoutUI();
-    } catch (err) {
-      els.signedInStatus.hidden = false;
-      els.signedInStatus.textContent = err.message || 'Sign-in failed, try again.';
-    }
-  }
-
-  function initGoogleSignIn() {
-    if (!CFG.googleOAuthClientId || !window.google || !window.google.accounts) return;
-    window.google.accounts.id.initialize({
-      client_id: CFG.googleOAuthClientId,
-      callback: handleGoogleCredential,
-    });
-    window.google.accounts.id.renderButton(els.googleSignInDiv, { theme: 'outline', size: 'large', width: 280 });
-  }
-
-  els.payDepositBtn.addEventListener('click', async () => {
-    if (!state.sessionToken) return;
+  els.acceptQuoteBtn.addEventListener('click', async () => {
     const missing = validateForm();
     if (missing.length) {
-      showFormError(`Please add ${missing.join(', ')} before paying.`);
+      showFormError(`Please add ${missing.join(', ')} before continuing.`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     clearFormError();
-    els.payDepositBtn.disabled = true;
-    els.payDepositBtn.textContent = 'Redirecting…';
+    els.acceptQuoteBtn.disabled = true;
+    els.acceptQuoteBtn.textContent = 'Submitting…';
     try {
       const res = await fetch(`${CFG.apiBase}/quote`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${state.sessionToken}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...moveInputPayload(),
           phone: state.phone,
           timeSlot: state.timeSlot,
+          customerName: state.customerName,
+          customerEmail: state.customerEmail,
         }),
       });
       const data = await res.json();
@@ -737,79 +700,97 @@
         throw new Error(data.message || 'Could not create booking');
       }
 
-      submitToPayfast(data.payfast);
+      state.acceptedReferenceId = data.referenceId;
+      showConfirmation(data);
     } catch (err) {
-      els.payDepositBtn.disabled = false;
-      els.payDepositBtn.textContent = 'Pay Deposit with PayFast';
+      els.acceptQuoteBtn.disabled = false;
+      els.acceptQuoteBtn.textContent = 'Accept Quote';
       showFormError(err.message || 'Something went wrong, please try again.');
     }
   });
 
-  function submitToPayfast(payfast) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = payfast.action_url;
-    Object.entries(payfast.fields).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = value;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
+  els.emailInvoiceBtn.addEventListener('click', async () => {
+    if (!state.acceptedReferenceId) return;
+    els.emailInvoiceBtn.disabled = true;
+    els.emailInvoiceStatus.hidden = false;
+    els.emailInvoiceStatus.textContent = 'Sending…';
+    try {
+      const res = await fetch(`${CFG.apiBase}/quote/${state.acceptedReferenceId}/email-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: state.customerEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Could not send the invoice');
+      els.emailInvoiceStatus.textContent = `Sent to ${data.email}.`;
+    } catch (err) {
+      els.emailInvoiceStatus.textContent = err.message || 'Something went wrong, please try again.';
+    } finally {
+      els.emailInvoiceBtn.disabled = false;
+    }
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* WhatsApp — formatted order summary, both pre- and post-accept     */
+  /* ---------------------------------------------------------------- */
+
+  function buildWhatsappMessage(opts = {}) {
+    const lines = ['Hi, I have a Four Oceans Group booking:'];
+    if (opts.referenceId) lines.push(`Ref: ${opts.referenceId}`);
+    lines.push(`Pickup: ${state.pickup || '?'}`);
+    lines.push(`Drop-off: ${state.dropoff || '?'}`);
+    if (state.lastQuote?.vehicleLabel) lines.push(`Vehicle: ${state.lastQuote.vehicleLabel}`);
+    lines.push(`Date: ${state.moveDate || '?'} (${state.timeSlot || '?'})`);
+    if (opts.finalPrice != null) lines.push(`Total: R${Math.round(opts.finalPrice)}`);
+    if (opts.depositAmount != null) lines.push(`Deposit: R${Math.round(opts.depositAmount)}`);
+    lines.push(`Name: ${state.customerName || '?'}`);
+    lines.push(`Phone: ${state.phone || '?'}`);
+    if (opts.note) lines.push(opts.note);
+    return lines.join('\n');
   }
-
-  /* ---------------------------------------------------------------- */
-  /* WhatsApp fallback                                                  */
-  /* ---------------------------------------------------------------- */
-
-  function whatsappMessage() {
-    return encodeURIComponent(
-      `Hi, I'd like to book a Hatfield relocation. Pickup: ${state.pickup || '?'}, Drop-off: ${state.dropoff || '?'}, Date: ${state.moveDate || '?'}`
-    );
+  function whatsappUrl(message) {
+    return `https://wa.me/${CFG.whatsappNumber}?text=${encodeURIComponent(message)}`;
   }
   function updateWhatsappFallback() {
-    const url = `https://wa.me/${CFG.whatsappNumber}?text=${whatsappMessage()}`;
+    const url = whatsappUrl(buildWhatsappMessage({
+      finalPrice: state.lastQuote?.finalPrice,
+      depositAmount: state.lastQuote?.depositAmount,
+    }));
     els.whatsappFallback.href = url;
     els.manualQuoteWhatsapp.href = url;
   }
 
   /* ---------------------------------------------------------------- */
-  /* Return-from-PayFast confirmation                                   */
+  /* Confirmation (shown immediately on accept — no payment redirect)  */
   /* ---------------------------------------------------------------- */
 
-  async function checkReturnStatus() {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    const status = params.get('status');
-    if (!ref) return false;
+  function showConfirmation(data) {
+    els.confirmationText.textContent = `Thanks, ${state.customerName || 'there'}! Your booking is confirmed — pay the deposit below via EFT using your reference, then send us proof of payment on WhatsApp.`;
 
-    if (status === 'cancelled') {
-      els.confirmationText.textContent = 'Payment was cancelled. Your booking was not confirmed — you can try again anytime.';
-      showConfirmation();
-      return true;
-    }
+    els.invoiceLink.href = data.invoiceUrl;
 
-    try {
-      const res = await fetch(`${CFG.apiBase}/quote/${ref}`);
-      const data = await res.json();
-      if (res.ok && data.status === 'deposit_paid') {
-        els.confirmationText.textContent = `Your deposit of R${Math.round(data.depositAmount)} has been received and your move is booked. We'll be in touch to confirm the details.`;
-      } else {
-        els.confirmationText.textContent = "We haven't received payment confirmation yet — this can take a minute. If it doesn't update, message us on WhatsApp.";
-      }
-    } catch (err) {
-      els.confirmationText.textContent = "We couldn't confirm your booking status automatically — message us on WhatsApp to confirm.";
-    }
-    showConfirmation();
-    return true;
-  }
+    const bank = data.bankDetails;
+    els.confirmationBank.innerHTML = `
+      <div class="quote-receipt__row"><span>Account holder</span><span>${bank.accountHolder}</span></div>
+      <div class="quote-receipt__row"><span>Bank</span><span>${bank.bankName}</span></div>
+      <div class="quote-receipt__row"><span>Account number</span><span>${bank.accountNumber}</span></div>
+      <div class="quote-receipt__row"><span>Branch code</span><span>${bank.branchCode}</span></div>
+      <div class="quote-receipt__row"><span>SWIFT code</span><span>${bank.swiftCode}</span></div>
+      <div class="quote-receipt__row"><span>Payment reference</span><span>${data.referenceId}</span></div>
+      <div class="quote-receipt__total"><span>Deposit to pay</span><span>R${Math.round(data.depositAmount)}</span></div>
+    `;
 
-  function showConfirmation() {
+    els.confirmationWhatsapp.href = whatsappUrl(buildWhatsappMessage({
+      referenceId: data.referenceId,
+      finalPrice: data.finalPrice,
+      depositAmount: data.depositAmount,
+      note: "I've made the EFT deposit for the above — please confirm my booking.",
+    }));
+
     els.quoteMain.hidden = true;
     els.stickyTotal.hidden = true;
     els.confirmation.hidden = false;
+    window.scrollTo({ top: 0 });
   }
 
   /* ---------------------------------------------------------------- */
@@ -852,11 +833,7 @@
   async function boot() {
     updateHelpersButtons();
     updateTripsButtons();
-    updateCheckoutUI();
     showReceiptPlaceholder('Add your pickup, drop-off and truck above to see your price.');
-
-    const handledReturn = await checkReturnStatus();
-    if (handledReturn) return;
 
     updateWhatsappFallback();
     setInterval(updateWhatsappFallback, 1000);
@@ -865,11 +842,6 @@
     if (CFG.googleMapsApiKey) {
       loadScript(`https://maps.googleapis.com/maps/api/js?key=${CFG.googleMapsApiKey}&libraries=places`)
         .then(initPlacesAutocomplete)
-        .catch(() => {});
-    }
-    if (CFG.googleOAuthClientId) {
-      loadScript('https://accounts.google.com/gsi/client')
-        .then(initGoogleSignIn)
         .catch(() => {});
     }
   }

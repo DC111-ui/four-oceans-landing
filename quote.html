@@ -160,6 +160,17 @@
     </div>
 
     <div class="quote-field">
+      <label for="customerNameInput">Full name</label>
+      <input type="text" id="customerNameInput" placeholder="Your name" autocomplete="name">
+    </div>
+
+    <div class="quote-field">
+      <label for="customerEmailInput">Email address</label>
+      <input type="email" id="customerEmailInput" placeholder="you@example.com" autocomplete="email">
+      <p class="quote-field__note">We'll send your invoice here.</p>
+    </div>
+
+    <div class="quote-field">
       <label for="phoneInput">Phone number</label>
       <input type="tel" id="phoneInput" placeholder="+27 …" autocomplete="tel">
     </div>
@@ -201,9 +212,7 @@
       <p class="quote-disclosure">The deposit below is <strong>non-refundable</strong> and confirms your booking slot; the balance is settled with the team on move day. The final price may change if the actual items or access conditions differ materially from what you told us.</p>
 
       <div class="quote-checkout" id="quoteCheckout">
-        <div id="googleSignInDiv"></div>
-        <p class="quote-checkout__signed-in" id="signedInStatus" hidden></p>
-        <button type="button" class="quote-pay-btn" id="payDepositBtn" disabled>Sign in with Google to Pay Deposit</button>
+        <button type="button" class="quote-pay-btn" id="acceptQuoteBtn">Accept Quote</button>
         <a class="quote-whatsapp-fallback" id="whatsappFallback" href="#" target="_blank" rel="noopener">Message us on WhatsApp instead</a>
       </div>
     </div>
@@ -218,8 +227,18 @@
       <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <h2>Booking Confirmed</h2>
-    <p id="confirmationText">Your deposit has been received and your move is booked. We'll be in touch to confirm the details.</p>
+    <p id="confirmationText">Your booking is confirmed. Pay the deposit below via EFT to secure your slot.</p>
+
+    <div class="quote-receipt quote-confirmation__bank" id="confirmationBank"></div>
+
     <div class="quote-confirmation__actions">
+      <a class="quote-btn quote-btn--filled" id="invoiceLink" href="#" target="_blank" rel="noopener">View / Download Invoice</a>
+      <button type="button" class="quote-btn quote-btn--ghost" id="emailInvoiceBtn">Email me this invoice</button>
+      <a class="quote-btn quote-btn--whatsapp" id="confirmationWhatsapp" href="#" target="_blank" rel="noopener">Message us on WhatsApp</a>
+    </div>
+    <p class="quote-checkout__signed-in" id="emailInvoiceStatus" hidden></p>
+
+    <div class="quote-confirmation__home">
       <a class="btn btn--gold btn--lg" href="index.html">Back to Home</a>
     </div>
   </div>
@@ -291,7 +310,6 @@
 <script>window.FOQ_CONFIG = {
   apiBase: 'https://shop.darlingtonchanakira.com/wp-json/four-oceans/v1',
   googleMapsApiKey: 'AIzaSyDfUfu0EJ0ovJ8ncr3nERWF2LQLjsCRQ1U',
-  googleOAuthClientId: '204916505546-2ofvnn0ftu03aqjnc14tlii29c2431cs.apps.googleusercontent.com',
   whatsappNumber: '27617037902'
 };</script>
 <script src="quote.js"></script>
