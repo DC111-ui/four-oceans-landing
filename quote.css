@@ -2,7 +2,7 @@
 
 .quote-body {
   background: var(--panel);
-  padding-bottom: 90px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
 
 /* ---- Header ---- */
@@ -18,15 +18,19 @@
   color: #fff;
 }
 .quote-header__back {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
+  margin-left: -6px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   color: #fff;
 }
-.quote-header__back:hover { background: rgba(255,255,255,.1); }
+@media (hover: hover) {
+  .quote-header__back:hover { background: rgba(255,255,255,.1); }
+}
+.quote-header__back:active { background: rgba(255,255,255,.18); }
 .quote-header__back svg { width: 20px; height: 20px; }
 .quote-header__title {
   font-family: var(--font-display);
@@ -35,7 +39,7 @@
   flex: 1;
   text-align: center;
 }
-.quote-header__spacer { width: 32px; }
+.quote-header__spacer { width: 38px; }
 
 /* ---- Main / sections ---- */
 .quote-main {
@@ -83,7 +87,7 @@
 
 .quote-form-error {
   position: fixed;
-  bottom: 78px;
+  bottom: calc(78px + env(safe-area-inset-bottom));
   left: 20px;
   right: 20px;
   z-index: 16;
@@ -137,7 +141,7 @@
   gap: 16px;
   align-items: flex-end;
 }
-.quote-field--row > div { flex: 1; }
+.quote-field--row > div { flex: 1; min-width: 0; }
 
 .quote-field select,
 .quote-field input[type="text"],
@@ -180,23 +184,26 @@
 .quote-item-row__stepper {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .quote-item-row__btn {
-  width: 26px;
-  height: 26px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: var(--panel);
   color: var(--navy-deep);
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .15s ease;
+  transition: background .15s ease, transform .1s ease;
 }
-.quote-item-row__btn:hover:not(:disabled) { background: var(--teal); color: #fff; }
+@media (hover: hover) {
+  .quote-item-row__btn:hover:not(:disabled) { background: var(--teal); color: #fff; }
+}
+.quote-item-row__btn:active:not(:disabled) { background: var(--teal); color: #fff; transform: scale(.92); }
 .quote-item-row__btn:disabled { opacity: .35; cursor: not-allowed; }
 .quote-item-row__qty {
   font-family: var(--font-display);
@@ -239,15 +246,18 @@
 .quote-text-link {
   background: none;
   border: none;
-  padding: 0;
-  margin-top: 12px;
+  padding: 6px 2px;
+  margin: 12px -2px 0;
   font-size: .85rem;
   font-weight: 600;
   color: var(--teal-deep);
   text-decoration: underline;
   cursor: pointer;
 }
-.quote-text-link:hover { color: var(--teal); }
+@media (hover: hover) {
+  .quote-text-link:hover { color: var(--teal); }
+}
+.quote-text-link:active { color: var(--teal); }
 
 /* ---- Load assistant modal ---- */
 .quote-modal {
@@ -280,6 +290,14 @@
   .quote-modal { align-items: center; }
   .quote-modal__panel { border-radius: var(--radius); max-height: 80vh; }
 }
+/* Landscape phones / short viewports: the sheet would otherwise eat the
+   whole screen and leave almost nothing for the scrollable item list. */
+@media (max-height: 480px) {
+  .quote-modal__panel { max-height: 96vh; }
+  .quote-modal__header { padding: 10px 16px; }
+  .quote-modal__body { padding: 10px 16px; }
+  .quote-modal__footer { padding: 8px 16px calc(8px + env(safe-area-inset-bottom)); }
+}
 .quote-modal__header {
   flex-shrink: 0;
   display: flex;
@@ -296,8 +314,9 @@
   margin: 0;
 }
 .quote-modal__close {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
+  margin-right: -8px;
   border: none;
   background: var(--panel);
   border-radius: 50%;
@@ -306,7 +325,10 @@
   color: var(--navy-deep);
   cursor: pointer;
 }
-.quote-modal__close:hover { background: var(--line); }
+@media (hover: hover) {
+  .quote-modal__close:hover { background: var(--line); }
+}
+.quote-modal__close:active { background: var(--line); transform: scale(.94); }
 .quote-modal__body {
   flex: 1;
   overflow-y: auto;
@@ -318,7 +340,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 20px;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   background: #fff;
 }
@@ -366,7 +388,10 @@
   color: var(--ink);
   cursor: pointer;
 }
-.quote-date-trigger:hover { border-color: var(--teal); }
+@media (hover: hover) {
+  .quote-date-trigger:hover { border-color: var(--teal); }
+}
+.quote-date-trigger:active { border-color: var(--teal); background: var(--panel); }
 .quote-calendar {
   position: relative;
   margin-top: 8px;
@@ -389,8 +414,8 @@
   color: var(--navy-deep);
 }
 .quote-calendar__nav {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border: none;
   background: var(--panel);
   border-radius: 50%;
@@ -398,7 +423,10 @@
   font-size: 1rem;
   cursor: pointer;
 }
-.quote-calendar__nav:hover { background: var(--teal); color: #fff; }
+@media (hover: hover) {
+  .quote-calendar__nav:hover { background: var(--teal); color: #fff; }
+}
+.quote-calendar__nav:active { background: var(--teal); color: #fff; }
 .quote-calendar__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -415,6 +443,7 @@
 }
 .quote-calendar__day {
   aspect-ratio: 1;
+  min-height: 40px;
   border: none;
   background: none;
   border-radius: 50%;
@@ -423,7 +452,10 @@
   color: var(--ink);
   cursor: pointer;
 }
-.quote-calendar__day:hover:not(:disabled) { background: rgba(28,140,134,.12); }
+@media (hover: hover) {
+  .quote-calendar__day:hover:not(:disabled) { background: rgba(28,140,134,.12); }
+}
+.quote-calendar__day:active:not(:disabled) { background: rgba(28,140,134,.2); }
 .quote-calendar__day:disabled { color: var(--line); cursor: not-allowed; }
 .quote-calendar__day[data-today] { border: 1px solid var(--teal); }
 .quote-calendar__day[data-selected] { background: var(--teal); color: #fff; }
@@ -468,9 +500,11 @@
   padding-bottom: 14px;
 }
 .quote-toggle-field label {
+  padding: 11px 0;
   font-weight: 700;
   font-size: .85rem;
   color: var(--navy-deep);
+  cursor: pointer;
 }
 .quote-toggle-field input { width: 22px; height: 22px; accent-color: var(--teal); }
 
@@ -508,12 +542,18 @@
   justify-content: center;
   transition: border-color .2s ease, background .2s ease, transform .15s ease, box-shadow .2s ease;
 }
-.quote-radio-card:hover {
-  border-color: var(--teal);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px -12px rgba(11,35,64,.3);
+@media (hover: hover) {
+  .quote-radio-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -12px rgba(11,35,64,.3);
+  }
 }
-.quote-radio-card:active { transform: translateY(0); }
+.quote-radio-card:active {
+  border-color: var(--teal);
+  background: rgba(28,140,134,.06);
+  transform: translateY(0) scale(.98);
+}
 .quote-radio-card span {
   font-weight: 400;
   font-size: .78rem;
@@ -550,7 +590,10 @@
   cursor: pointer;
   transition: border-color .2s ease, background .2s ease;
 }
-.quote-checkbox:hover { border-color: var(--teal); }
+@media (hover: hover) {
+  .quote-checkbox:hover { border-color: var(--teal); }
+}
+.quote-checkbox:active { border-color: var(--teal); background: rgba(28,140,134,.06); }
 .quote-checkbox:has(input:checked) {
   border-color: var(--teal);
   background: rgba(28,140,134,.06);
@@ -574,8 +617,8 @@
   padding: 8px 20px;
 }
 .quote-stepper__btn {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--navy-deep);
@@ -587,7 +630,9 @@
   justify-content: center;
   transition: background .15s ease, transform .1s ease;
 }
-.quote-stepper__btn:hover:not(:disabled) { background: var(--teal); }
+@media (hover: hover) {
+  .quote-stepper__btn:hover:not(:disabled) { background: var(--teal); }
+}
 .quote-stepper__btn:active:not(:disabled) { transform: scale(.92); }
 .quote-stepper__btn:disabled { opacity: .35; cursor: not-allowed; }
 .quote-stepper__value {
@@ -671,15 +716,23 @@
   font-size: 1rem;
   transition: background .2s ease, transform .15s ease;
 }
-.quote-pay-btn:hover:not(:disabled) { background: var(--gold-bright); transform: translateY(-2px); }
+@media (hover: hover) {
+  .quote-pay-btn:hover:not(:disabled) { background: var(--gold-bright); transform: translateY(-2px); }
+}
+.quote-pay-btn:active:not(:disabled) { background: var(--gold-bright); transform: scale(.98); }
 .quote-pay-btn:disabled { opacity: .5; cursor: not-allowed; }
 .quote-whatsapp-fallback {
+  display: inline-block;
+  padding: 6px 2px;
   font-size: .85rem;
   font-weight: 600;
   color: var(--teal-deep);
   text-decoration: underline;
 }
-.quote-whatsapp-fallback:hover { color: var(--teal); }
+@media (hover: hover) {
+  .quote-whatsapp-fallback:hover { color: var(--teal); }
+}
+.quote-whatsapp-fallback:active { color: var(--teal); }
 
 /* ---- Confirmation ---- */
 .quote-confirmation-screen {
@@ -744,7 +797,7 @@
   right: 0;
   background: var(--navy-deep);
   color: #fff;
-  padding: 14px 20px;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -775,19 +828,24 @@
   background: var(--navy-deep);
   color: #fff;
 }
-.quote-btn--filled:hover:not(:disabled) { background: var(--teal-deep); }
 .quote-btn--ghost {
   background: transparent;
   border-color: var(--teal);
   color: var(--teal-deep);
 }
-.quote-btn--ghost:hover:not(:disabled) { background: rgba(28,140,134,.08); }
 .quote-btn--whatsapp {
   background: #25D366;
   border-color: #25D366;
   color: #fff;
 }
-.quote-btn--whatsapp:hover:not(:disabled) { background: #1DA851; border-color: #1DA851; }
+@media (hover: hover) {
+  .quote-btn--filled:hover:not(:disabled) { background: var(--teal-deep); }
+  .quote-btn--ghost:hover:not(:disabled) { background: rgba(28,140,134,.08); }
+  .quote-btn--whatsapp:hover:not(:disabled) { background: #1DA851; border-color: #1DA851; }
+}
+.quote-btn--filled:active:not(:disabled) { background: var(--teal-deep); }
+.quote-btn--ghost:active:not(:disabled) { background: rgba(28,140,134,.08); }
+.quote-btn--whatsapp:active:not(:disabled) { background: #1DA851; border-color: #1DA851; }
 .quote-btn:active:not(:disabled) { transform: scale(.97); }
 .quote-btn:disabled { opacity: .4; cursor: not-allowed; }
 
