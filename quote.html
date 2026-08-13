@@ -73,21 +73,6 @@
     <p class="quote-step__hint">Tell us what you've got — we'll work out the right vehicle and price from it, not the other way around.</p>
 
     <div class="quote-field">
-      <label>Package</label>
-      <div class="quote-radio-cards quote-radio-cards--tier" data-field="packageTier">
-        <button type="button" class="quote-radio-card" data-value="basic">
-          <strong>Basic</strong><span>Transport only (bakkie service)</span><span class="quote-radio-card__price" data-price="basic"></span>
-        </button>
-        <button type="button" class="quote-radio-card" data-value="mid">
-          <strong>Mid</strong><span>Move-out assistance, boxes supplied, packing materials</span><span class="quote-radio-card__price" data-price="mid"></span>
-        </button>
-        <button type="button" class="quote-radio-card" data-value="premium">
-          <strong>Premium</strong><span>Packing, wrapping, carrying, transportation</span><span class="quote-radio-card__price" data-price="premium"></span>
-        </button>
-      </div>
-    </div>
-
-    <div class="quote-field">
       <label>Bedroom</label>
       <div class="quote-item-list" id="itemsBedroom"></div>
     </div>
@@ -101,40 +86,82 @@
     </div>
 
     <p class="quote-volume-note" id="volumeNote"></p>
+
+    <div class="quote-field">
+      <label for="goodsValueInput">Estimated value of your belongings (R)</label>
+      <input type="number" id="goodsValueInput" min="0" step="500" placeholder="e.g. 15000">
+      <p class="quote-field__note">Used to work out goods-in-transit protection on your quote.</p>
+    </div>
+
+    <div class="quote-field">
+      <label>Any of these? (we'll want to look at these in person)</label>
+      <div class="quote-checkbox-list" id="specialItemsList">
+        <label class="quote-checkbox"><input type="checkbox" value="piano"> Piano / keyboard</label>
+        <label class="quote-checkbox"><input type="checkbox" value="pool_table"> Pool table</label>
+        <label class="quote-checkbox"><input type="checkbox" value="safe"> Large safe</label>
+        <label class="quote-checkbox"><input type="checkbox" value="oversized_fridge"> Very large fridge</label>
+        <label class="quote-checkbox"><input type="checkbox" value="heavy_machinery"> Heavy machinery</label>
+        <label class="quote-checkbox"><input type="checkbox" value="glass_furniture"> Glass furniture</label>
+        <label class="quote-checkbox"><input type="checkbox" value="antiques"> Antiques</label>
+        <label class="quote-checkbox"><input type="checkbox" value="fragile_high_value"> Fragile / high-value item</label>
+        <label class="quote-checkbox"><input type="checkbox" value="motorcycle"> Motorcycle</label>
+        <label class="quote-checkbox"><input type="checkbox" value="gym_equipment"> Gym equipment</label>
+        <label class="quote-checkbox"><input type="checkbox" value="oversized_furniture"> Oversized furniture</label>
+      </div>
+    </div>
   </section>
 
   <!-- ============ STEP 3: ACCESS ============ -->
   <section class="quote-step" data-step="3" hidden>
     <h2 class="quote-step__title">Access at both ends</h2>
-    <p class="quote-step__hint">A 6th floor with a working lift is often easier than a 2nd floor walk-up — so we price the actual difficulty, not just the floor number.</p>
+    <p class="quote-step__hint">Stairs without a working lift add time and crew, so we ask about pickup and drop-off separately.</p>
 
-    <div class="quote-field quote-field--row">
-      <div>
-        <label for="floorSelect">Floor</label>
-        <select id="floorSelect">
-          <option value="0">Ground</option>
-          <option value="1">1st</option>
-          <option value="2">2nd</option>
-          <option value="3">3rd</option>
-          <option value="4">4th</option>
-          <option value="5">5th</option>
-          <option value="6">6th</option>
-          <option value="7">7th+</option>
-        </select>
+    <div class="quote-subsection">
+      <h3 class="quote-subsection__title">Pickup</h3>
+      <div class="quote-field quote-field--row">
+        <div>
+          <label for="pickupFloorSelect">Floor</label>
+          <select id="pickupFloorSelect">
+            <option value="0">Ground</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+            <option value="6">6th</option>
+            <option value="7">7th+</option>
+          </select>
+        </div>
+        <div class="quote-toggle-field">
+          <label for="pickupLiftToggle">Is there a lift?</label>
+          <input type="checkbox" id="pickupLiftToggle">
+        </div>
       </div>
-      <div class="quote-toggle-field">
-        <label for="liftToggle">Is there a lift?</label>
-        <input type="checkbox" id="liftToggle">
-      </div>
+      <label class="quote-checkbox"><input type="checkbox" id="pickupLiftTooSmall"> The lift is too small for our furniture</label>
     </div>
 
-    <div class="quote-field">
-      <label>Carry distance from parking to the door</label>
-      <div class="quote-radio-cards" data-field="carryDistance">
-        <button type="button" class="quote-radio-card" data-value="close">Right outside</button>
-        <button type="button" class="quote-radio-card" data-value="moderate">Short walk (~20–50m)</button>
-        <button type="button" class="quote-radio-card" data-value="far">Far (50m+)</button>
+    <div class="quote-subsection">
+      <h3 class="quote-subsection__title">Drop-off</h3>
+      <div class="quote-field quote-field--row">
+        <div>
+          <label for="dropoffFloorSelect">Floor</label>
+          <select id="dropoffFloorSelect">
+            <option value="0">Ground</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+            <option value="6">6th</option>
+            <option value="7">7th+</option>
+          </select>
+        </div>
+        <div class="quote-toggle-field">
+          <label for="dropoffLiftToggle">Is there a lift?</label>
+          <input type="checkbox" id="dropoffLiftToggle">
+        </div>
       </div>
+      <label class="quote-checkbox"><input type="checkbox" id="dropoffLiftTooSmall"> The lift is too small for our furniture</label>
     </div>
 
     <div class="quote-field quote-checkbox-list">
@@ -143,11 +170,11 @@
     </div>
 
     <div class="quote-field">
-      <label>Crew size <span class="quote-field__note" id="crewNote"></span></label>
+      <label>Additional helpers <span class="quote-field__note" id="helperNote"></span></label>
       <div class="quote-stepper">
-        <button type="button" class="quote-stepper__btn" id="crewMinus" aria-label="Fewer movers">−</button>
-        <span class="quote-stepper__value" id="crewValue">2</span>
-        <button type="button" class="quote-stepper__btn" id="crewPlus" aria-label="More movers">+</button>
+        <button type="button" class="quote-stepper__btn" id="helpersMinus" aria-label="Fewer helpers">−</button>
+        <span class="quote-stepper__value" id="helpersValue">0</span>
+        <button type="button" class="quote-stepper__btn" id="helpersPlus" aria-label="More helpers">+</button>
       </div>
     </div>
   </section>

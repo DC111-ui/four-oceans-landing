@@ -6,15 +6,18 @@
     step: 1,
     pickup: '',
     dropoff: '',
-    packageTier: null,
     items: {},
-    floorNumber: 0,
-    hasLift: false,
-    carryDistance: null,
+    pickupFloor: 0,
+    pickupElevator: false,
+    pickupElevatorTooSmall: false,
+    dropoffFloor: 0,
+    dropoffElevator: false,
+    dropoffElevatorTooSmall: false,
+    additionalHelpers: 0,
     packagingMaterials: false,
     packagingLabor: false,
-    crewAdjustment: 0,
-    standardCrew: 2,
+    goodsValue: 0,
+    specialItems: [],
     moveDate: '',
     timeSlot: null,
     phone: '',
@@ -45,16 +48,22 @@
     itemsKitchen: $('#itemsKitchen'),
     itemsOther: $('#itemsOther'),
     volumeNote: $('#volumeNote'),
-    floorSelect: $('#floorSelect'),
-    liftToggle: $('#liftToggle'),
+    goodsValueInput: $('#goodsValueInput'),
+    specialItemsList: $('#specialItemsList'),
+    pickupFloorSelect: $('#pickupFloorSelect'),
+    pickupLiftToggle: $('#pickupLiftToggle'),
+    pickupLiftTooSmall: $('#pickupLiftTooSmall'),
+    dropoffFloorSelect: $('#dropoffFloorSelect'),
+    dropoffLiftToggle: $('#dropoffLiftToggle'),
+    dropoffLiftTooSmall: $('#dropoffLiftTooSmall'),
     packagingMaterials: $('#packagingMaterials'),
     packagingLabor: $('#packagingLabor'),
     materialsFee: $('#materialsFee'),
     laborFee: $('#laborFee'),
-    crewMinus: $('#crewMinus'),
-    crewPlus: $('#crewPlus'),
-    crewValue: $('#crewValue'),
-    crewNote: $('#crewNote'),
+    helpersMinus: $('#helpersMinus'),
+    helpersPlus: $('#helpersPlus'),
+    helpersValue: $('#helpersValue'),
+    helperNote: $('#helperNote'),
     moveDate: $('#moveDate'),
     phoneInput: $('#phoneInput'),
     quoteReceipt: $('#quoteReceipt'),
@@ -70,8 +79,7 @@
     stepError: $('#stepError'),
   };
 
-  const STANDARD_CREW = { basic: 1, mid: 2, premium: 3 };
-  const MAX_CREW = 6;
+  const MAX_ADDITIONAL_HELPERS = 10;
   const GROUP_CONTAINERS = { bedroom: els.itemsBedroom, kitchen: els.itemsKitchen, other: els.itemsOther };
 
   const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -117,8 +125,7 @@
 
   function validateStep(n) {
     if (n === 1) return state.inZone === true;
-    if (n === 2) return state.packageTier && totalItemCount() > 0;
-    if (n === 3) return !!state.carryDistance;
+    if (n === 2) return totalItemCount() > 0;
     if (n === 4) return state.moveDate && state.timeSlot && state.phone.trim().length >= 7;
     return true;
   }
@@ -142,11 +149,8 @@
       }
       els.zoneStatus.setAttribute('data-state', 'error');
     }
-    if (n === 2 && !(state.packageTier && totalItemCount() > 0)) {
-      showStepError('Pick a package and add at least one item before continuing.');
-    }
-    if (n === 3 && !state.carryDistance) {
-      showStepError('Tell us the carry distance from parking to the door before continuing.');
+    if (n === 2 && totalItemCount() === 0) {
+      showStepError('Add at least one item before continuing.');
     }
     if (n === 4 && !(state.moveDate && state.timeSlot && state.phone.trim().length >= 7)) {
       showStepError('Add a move date, time slot and a valid phone number before continuing.');
@@ -246,15 +250,6 @@
     });
   }
 
-  wireRadioCards('packageTier', (tier) => {
-    state.standardCrew = STANDARD_CREW[tier] || 2;
-    state.crewAdjustment = 0;
-    els.crewValue.textContent = state.standardCrew;
-    updateCrewNote();
-  });
-
-  wireRadioCards('carryDistance');
-
   function renderItemCatalog() {
     const catalog = state.pricingConfig?.itemCatalog;
     if (!catalog) return;
@@ -298,7 +293,8 @@
 
   function updateVolumeNote() {
     const catalog = state.pricingConfig?.itemCatalog;
-    if (!catalog) {
+    const vehicles = state.pricingConfig?.vehicles;
+    if (!catalog || !vehicles) {
       els.volumeNote.textContent = '';
       return;
     }
@@ -308,21 +304,49 @@
       return;
     }
     const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
-    const threshold = state.pricingConfig.vehicleVolumeThreshold || 12;
-    const vehicle = volume > threshold ? 'a small truck' : 'a bakkie';
-    els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${vehicle} will do it.`;
+    const match = Object.values(vehicles).find((v) => volume <= v.volumeThreshold);
+    const vehicleLabel = match ? match.label : "a load we'll need to quote personally";
+    els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${vehicleLabel} will do it.`;
   }
+
+  els.goodsValueInput.addEventListener('input', () => {
+    state.goodsValue = Number(els.goodsValueInput.value) || 0;
+    refreshLiveTotal();
+  });
+
+  $$('#specialItemsList input[type="checkbox"]').forEach((cb) => {
+    cb.addEventListener('change', () => {
+      state.specialItems = $$('#specialItemsList input[type="checkbox"]:checked').map((el) => el.value);
+      refreshLiveTotal();
+    });
+  });
 
   /* ---------------------------------------------------------------- */
   /* Step 3: Access                                                    */
   /* ---------------------------------------------------------------- */
 
-  els.floorSelect.addEventListener('change', () => {
-    state.floorNumber = Number(els.floorSelect.value);
+  els.pickupFloorSelect.addEventListener('change', () => {
+    state.pickupFloor = Number(els.pickupFloorSelect.value);
     refreshLiveTotal();
   });
-  els.liftToggle.addEventListener('change', () => {
-    state.hasLift = els.liftToggle.checked;
+  els.pickupLiftToggle.addEventListener('change', () => {
+    state.pickupElevator = els.pickupLiftToggle.checked;
+    refreshLiveTotal();
+  });
+  els.pickupLiftTooSmall.addEventListener('change', () => {
+    state.pickupElevatorTooSmall = els.pickupLiftTooSmall.checked;
+    refreshLiveTotal();
+  });
+  els.dropoffFloorSelect.addEventListener('change', () => {
+    state.dropoffFloor = Number(els.dropoffFloorSelect.value);
+    refreshLiveTotal();
+  });
+  els.dropoffLiftToggle.addEventListener('change', () => {
+    state.dropoffElevator = els.dropoffLiftToggle.checked;
+    refreshLiveTotal();
+  });
+  els.dropoffLiftTooSmall.addEventListener('change', () => {
+    state.dropoffElevatorTooSmall = els.dropoffLiftTooSmall.checked;
     refreshLiveTotal();
   });
   els.packagingMaterials.addEventListener('change', () => {
@@ -334,31 +358,23 @@
     refreshLiveTotal();
   });
 
-  function updateCrewButtons() {
-    const count = Math.max(1, Math.min(MAX_CREW, state.standardCrew + state.crewAdjustment));
-    els.crewValue.textContent = count;
-    els.crewMinus.disabled = count <= 1;
-    els.crewPlus.disabled = count >= MAX_CREW;
-    updateCrewNote();
+  function updateHelpersButtons() {
+    els.helpersValue.textContent = state.additionalHelpers;
+    els.helpersMinus.disabled = state.additionalHelpers <= 0;
+    els.helpersPlus.disabled = state.additionalHelpers >= MAX_ADDITIONAL_HELPERS;
   }
-  function updateCrewNote() {
-    if (!state.pricingConfig) {
-      els.crewNote.textContent = `${state.standardCrew} included with this package`;
-      return;
-    }
-    const { addMoverFee, removeMoverCredit } = state.pricingConfig;
-    els.crewNote.textContent = `${state.standardCrew} included · +R${addMoverFee}/extra, -R${removeMoverCredit} if fewer`;
-  }
-  els.crewMinus.addEventListener('click', () => {
-    state.crewAdjustment -= 1;
-    updateCrewButtons();
+  els.helpersMinus.addEventListener('click', () => {
+    state.additionalHelpers = Math.max(0, state.additionalHelpers - 1);
+    updateHelpersButtons();
     refreshLiveTotal();
   });
-  els.crewPlus.addEventListener('click', () => {
-    state.crewAdjustment += 1;
-    updateCrewButtons();
+  els.helpersPlus.addEventListener('click', () => {
+    state.additionalHelpers = Math.min(MAX_ADDITIONAL_HELPERS, state.additionalHelpers + 1);
+    updateHelpersButtons();
     refreshLiveTotal();
   });
+
+  wireRadioCards('timeSlot');
 
   els.moveDate.addEventListener('change', () => { state.moveDate = els.moveDate.value; });
   els.phoneInput.addEventListener('input', () => { state.phone = els.phoneInput.value; });
@@ -369,7 +385,7 @@
 
   let liveTotalTimer = null;
   function refreshLiveTotal() {
-    if (state.step < 2 || !state.pickup || !state.dropoff || !state.packageTier || totalItemCount() === 0) return;
+    if (state.step < 2 || !state.pickup || !state.dropoff || totalItemCount() === 0) return;
     clearTimeout(liveTotalTimer);
     liveTotalTimer = setTimeout(fetchQuotePreview, 350);
   }
@@ -378,20 +394,24 @@
     return {
       pickup: state.pickup,
       dropoff: state.dropoff,
-      packageTier: state.packageTier,
       items: state.items,
-      floorNumber: state.floorNumber,
-      hasLift: state.hasLift,
-      carryDistance: state.carryDistance || 'close',
+      pickupFloor: state.pickupFloor,
+      pickupElevator: state.pickupElevator,
+      pickupElevatorTooSmall: state.pickupElevatorTooSmall,
+      dropoffFloor: state.dropoffFloor,
+      dropoffElevator: state.dropoffElevator,
+      dropoffElevatorTooSmall: state.dropoffElevatorTooSmall,
+      additionalHelpers: state.additionalHelpers,
       packagingMaterials: state.packagingMaterials,
       packagingLabor: state.packagingLabor,
-      crewAdjustment: state.crewAdjustment,
+      goodsValue: state.goodsValue,
+      specialItems: state.specialItems.reduce((obj, key) => { obj[key] = true; return obj; }, {}),
       moveDate: state.moveDate || todayISO(),
     };
   }
 
   async function fetchQuotePreview() {
-    if (!state.packageTier || totalItemCount() === 0) return;
+    if (totalItemCount() === 0) return;
     try {
       const res = await fetch(`${CFG.apiBase}/quote-preview`, {
         method: 'POST',
@@ -429,15 +449,9 @@
     const cfg = state.pricingConfig;
     if (!cfg) return;
 
-    $$('.quote-radio-card__price').forEach((el) => {
-      const key = el.dataset.price;
-      const amount = cfg.packageFee[key];
-      el.textContent = amount ? `+R${amount}` : 'included';
-    });
-
     els.materialsFee.textContent = `+R${cfg.materialsFee}`;
     els.laborFee.textContent = `+R${cfg.packingLaborFee}`;
-    updateCrewNote();
+    els.helperNote.textContent = `+R${cfg.helperFee} each, beyond your vehicle's standard crew`;
   }
 
   function renderReceipt(data) {
@@ -450,15 +464,16 @@
     els.manualQuoteNotice.hidden = true;
     els.quotePriceSection.hidden = false;
 
-    const vehicleLabel = data.vehicleType === 'small_truck' ? 'Small truck' : 'Bakkie';
+    const helpers = data.standardHelpers || 0;
+    const crewLabel = `Driver${helpers > 0 ? ` + ${helpers} helper${helpers > 1 ? 's' : ''}` : ''}`;
     const rows = data.items.map((item) =>
       `<div class="quote-receipt__row"><span>${item.label}</span><span>R${Math.round(item.amount)}</span></div>`
     ).join('');
     els.quoteReceipt.innerHTML = `
-      <div class="quote-receipt__row"><span>Vehicle</span><span>${vehicleLabel}</span></div>
+      <div class="quote-receipt__row"><span>Standard crew</span><span>${crewLabel}</span></div>
       ${rows}
       <div class="quote-receipt__total"><span>Total</span><span>R${Math.round(data.finalPrice)}</span></div>
-      <div class="quote-receipt__deposit"><span>Deposit due now</span><span>R${Math.round(data.depositAmount)}</span></div>
+      <div class="quote-receipt__deposit"><span>Deposit due now (50%)</span><span>R${Math.round(data.depositAmount)}</span></div>
       <div class="quote-receipt__balance"><span>Balance on move day</span><span>R${Math.round(data.balanceAmount)}</span></div>
     `;
   }
@@ -653,7 +668,7 @@
   /* ---------------------------------------------------------------- */
 
   async function boot() {
-    updateCrewButtons();
+    updateHelpersButtons();
     updateCheckoutUI();
 
     const handledReturn = await checkReturnStatus();
