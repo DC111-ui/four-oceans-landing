@@ -23,101 +23,51 @@
   <span class="quote-header__spacer" aria-hidden="true"></span>
 </header>
 
-<nav class="quote-progress" aria-label="Quote progress">
-  <ol class="quote-progress__list">
-    <li class="quote-progress__step" data-step-indicator="1"><span class="quote-progress__circle">1</span><span class="quote-progress__label">Route</span></li>
-    <li class="quote-progress__step" data-step-indicator="2"><span class="quote-progress__circle">2</span><span class="quote-progress__label">Belongings</span></li>
-    <li class="quote-progress__step" data-step-indicator="3"><span class="quote-progress__circle">3</span><span class="quote-progress__label">Access</span></li>
-    <li class="quote-progress__step" data-step-indicator="4"><span class="quote-progress__circle">4</span><span class="quote-progress__label">Date &amp; Phone</span></li>
-    <li class="quote-progress__step" data-step-indicator="5"><span class="quote-progress__circle">5</span><span class="quote-progress__label">Your Quote</span></li>
-  </ol>
-</nav>
+<main class="quote-main" id="quoteMain">
 
-<main class="quote-main">
-
-  <!-- ============ STEP 1: ROUTE ============ -->
-  <section class="quote-step" data-step="1">
+  <!-- ============ ROUTE ============ -->
+  <section class="quote-section">
     <h2 class="quote-step__title">Where are you moving?</h2>
     <p class="quote-step__hint">Hatfield student relocations only, for now — pickup and drop-off both need to be in the Hatfield/Brooklyn/Colbyn/Sunnyside/Arcadia/Menlo Park area.</p>
 
     <div class="quote-field">
-      <label for="pickupSelect">Pickup residence</label>
-      <select id="pickupSelect">
-        <option value="">Select your residence…</option>
-        <option value="Boekenhout Residence, Hatfield, Pretoria">Boekenhout</option>
-        <option value="Curlewis Residence, Hatfield, Pretoria">Curlewis</option>
-        <option value="Erika Residence, Hatfield, Pretoria">Erika</option>
-        <option value="Jasmyn Residence, Hatfield, Pretoria">Jasmyn</option>
-        <option value="Katjiepiering Residence, Hatfield, Pretoria">Katjiepiering</option>
-        <option value="Magrietjie Residence, Hatfield, Pretoria">Magrietjie</option>
-        <option value="Mopanie Residence, Hatfield, Pretoria">Mopanie</option>
-        <option value="Nerina Residence, Hatfield, Pretoria">Nerina</option>
-        <option value="Olienhout Residence, Hatfield, Pretoria">Olienhout</option>
-        <option value="Tuks Village, Hatfield, Pretoria">Tuks Village</option>
-        <option value="__other__">Other Hatfield/Brooklyn-area address…</option>
-      </select>
-      <input type="text" id="pickupOther" class="quote-field__other" placeholder="Search your address…" style="display:none">
+      <label for="pickupInput">Pickup address</label>
+      <input type="text" id="pickupInput" placeholder="Start typing your pickup address…">
     </div>
 
     <div class="quote-field">
       <label for="dropoffInput">Drop-off address</label>
-      <input type="text" id="dropoffInput" placeholder="Search address in Hatfield, Brooklyn, Colbyn, Sunnyside, Arcadia, Menlo Park…">
+      <input type="text" id="dropoffInput" placeholder="Start typing your drop-off address…">
     </div>
 
     <p class="quote-zone-status" id="zoneStatus" role="status" aria-live="polite"></p>
   </section>
 
-  <!-- ============ STEP 2: BELONGINGS ============ -->
-  <section class="quote-step" data-step="2" hidden>
-    <h2 class="quote-step__title">What are you moving?</h2>
-    <p class="quote-step__hint">Tell us what you've got — we'll work out the right vehicle and price from it, not the other way around.</p>
+  <!-- ============ TRUCK SELECTION ============ -->
+  <section class="quote-section">
+    <h2 class="quote-step__title">Truck selection</h2>
+    <p class="quote-step__hint">Pick the truck for your move, or use the load assistant if you're not sure.</p>
 
-    <div class="quote-field">
-      <label>Bedroom</label>
-      <div class="quote-item-list" id="itemsBedroom"></div>
-    </div>
-    <div class="quote-field">
-      <label>Kitchen &amp; appliances</label>
-      <div class="quote-item-list" id="itemsKitchen"></div>
-    </div>
-    <div class="quote-field">
-      <label>Other</label>
-      <div class="quote-item-list" id="itemsOther"></div>
-    </div>
-
-    <p class="quote-volume-note" id="volumeNote"></p>
-
-    <div class="quote-field">
-      <label for="goodsValueInput">Estimated value of your belongings (R)</label>
-      <input type="number" id="goodsValueInput" min="0" step="500" placeholder="e.g. 15000">
-      <p class="quote-field__note">Used to work out goods-in-transit protection on your quote.</p>
-    </div>
-
-    <div class="quote-field">
-      <label>Any of these? (we'll want to look at these in person)</label>
-      <div class="quote-checkbox-list" id="specialItemsList">
-        <label class="quote-checkbox"><input type="checkbox" value="piano"> Piano / keyboard</label>
-        <label class="quote-checkbox"><input type="checkbox" value="pool_table"> Pool table</label>
-        <label class="quote-checkbox"><input type="checkbox" value="safe"> Large safe</label>
-        <label class="quote-checkbox"><input type="checkbox" value="oversized_fridge"> Very large fridge</label>
-        <label class="quote-checkbox"><input type="checkbox" value="heavy_machinery"> Heavy machinery</label>
-        <label class="quote-checkbox"><input type="checkbox" value="glass_furniture"> Glass furniture</label>
-        <label class="quote-checkbox"><input type="checkbox" value="antiques"> Antiques</label>
-        <label class="quote-checkbox"><input type="checkbox" value="fragile_high_value"> Fragile / high-value item</label>
-        <label class="quote-checkbox"><input type="checkbox" value="motorcycle"> Motorcycle</label>
-        <label class="quote-checkbox"><input type="checkbox" value="gym_equipment"> Gym equipment</label>
-        <label class="quote-checkbox"><input type="checkbox" value="oversized_furniture"> Oversized furniture</label>
-      </div>
-    </div>
+    <div class="quote-radio-cards quote-radio-cards--vehicles" id="vehicleCards"></div>
+    <button type="button" class="quote-text-link" id="loadAssistantTrigger">Not sure which truck fits? Use the load assistant</button>
   </section>
 
-  <!-- ============ STEP 3: ACCESS ============ -->
-  <section class="quote-step" data-step="3" hidden>
-    <h2 class="quote-step__title">Access at both ends</h2>
+  <!-- ============ MOVE REQUIREMENTS ============ -->
+  <section class="quote-section">
+    <h2 class="quote-step__title">Move requirements</h2>
     <p class="quote-step__hint">Stairs without a working lift add time and crew, so we ask about pickup and drop-off separately.</p>
 
+    <div class="quote-field">
+      <label>Additional helpers <span class="quote-field__note" id="helperNote"></span></label>
+      <div class="quote-stepper">
+        <button type="button" class="quote-stepper__btn" id="helpersMinus" aria-label="Fewer helpers">−</button>
+        <span class="quote-stepper__value" id="helpersValue">0</span>
+        <button type="button" class="quote-stepper__btn" id="helpersPlus" aria-label="More helpers">+</button>
+      </div>
+    </div>
+
     <div class="quote-subsection">
-      <h3 class="quote-subsection__title">Pickup</h3>
+      <h3 class="quote-subsection__title">Pickup floor</h3>
       <div class="quote-field quote-field--row">
         <div>
           <label for="pickupFloorSelect">Floor</label>
@@ -138,10 +88,11 @@
         </div>
       </div>
       <label class="quote-checkbox"><input type="checkbox" id="pickupLiftTooSmall"> The lift is too small for our furniture</label>
+      <p class="quote-access-preview" id="pickupAccessPreview"></p>
     </div>
 
     <div class="quote-subsection">
-      <h3 class="quote-subsection__title">Drop-off</h3>
+      <h3 class="quote-subsection__title">Drop-off floor</h3>
       <div class="quote-field quote-field--row">
         <div>
           <label for="dropoffFloorSelect">Floor</label>
@@ -162,31 +113,41 @@
         </div>
       </div>
       <label class="quote-checkbox"><input type="checkbox" id="dropoffLiftTooSmall"> The lift is too small for our furniture</label>
+      <p class="quote-access-preview" id="dropoffAccessPreview"></p>
+    </div>
+
+    <div class="quote-field">
+      <label>Number of trips <span class="quote-field__note">More than one truckload?</span></label>
+      <div class="quote-stepper">
+        <button type="button" class="quote-stepper__btn" id="tripsMinus" aria-label="Fewer trips">−</button>
+        <span class="quote-stepper__value" id="tripsValue">1</span>
+        <button type="button" class="quote-stepper__btn" id="tripsPlus" aria-label="More trips">+</button>
+      </div>
     </div>
 
     <div class="quote-field quote-checkbox-list">
       <label class="quote-checkbox"><input type="checkbox" id="packagingMaterials"> I need packing materials (boxes/wrap) <span class="quote-checkbox__fee" id="materialsFee"></span></label>
       <label class="quote-checkbox"><input type="checkbox" id="packagingLabor"> I need someone to pack for me <span class="quote-checkbox__fee" id="laborFee"></span></label>
     </div>
-
-    <div class="quote-field">
-      <label>Additional helpers <span class="quote-field__note" id="helperNote"></span></label>
-      <div class="quote-stepper">
-        <button type="button" class="quote-stepper__btn" id="helpersMinus" aria-label="Fewer helpers">−</button>
-        <span class="quote-stepper__value" id="helpersValue">0</span>
-        <button type="button" class="quote-stepper__btn" id="helpersPlus" aria-label="More helpers">+</button>
-      </div>
-    </div>
   </section>
 
-  <!-- ============ STEP 4: DATE & PHONE ============ -->
-  <section class="quote-step" data-step="4" hidden>
-    <h2 class="quote-step__title">When's the move?</h2>
+  <!-- ============ SCHEDULE ============ -->
+  <section class="quote-section">
+    <h2 class="quote-step__title">Schedule</h2>
     <p class="quote-step__hint">Same-day and next-day bookings are fine — a rush fee applies for short notice.</p>
 
     <div class="quote-field">
-      <label for="moveDate">Move date</label>
-      <input type="date" id="moveDate">
+      <label for="moveDateTrigger">Move date</label>
+      <button type="button" class="quote-date-trigger" id="moveDateTrigger">Select a date</button>
+      <div class="quote-calendar" id="moveDateCalendar" hidden>
+        <div class="quote-calendar__header">
+          <button type="button" class="quote-calendar__nav" id="calPrevMonth" aria-label="Previous month">‹</button>
+          <span class="quote-calendar__month" id="calMonthLabel"></span>
+          <button type="button" class="quote-calendar__nav" id="calNextMonth" aria-label="Next month">›</button>
+        </div>
+        <div class="quote-calendar__weekdays"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+        <div class="quote-calendar__grid" id="calGrid"></div>
+      </div>
     </div>
 
     <div class="quote-field">
@@ -203,12 +164,28 @@
     </div>
   </section>
 
-  <!-- ============ STEP 5: YOUR QUOTE ============ -->
-  <section class="quote-step" data-step="5" hidden>
+  <!-- ============ GOODS IN TRANSIT COVER ============ -->
+  <section class="quote-section">
+    <h2 class="quote-step__title">Goods in Transit cover</h2>
+
+    <div class="quote-field">
+      <label class="quote-checkbox"><input type="checkbox" id="gitCoverToggle"> Request cover</label>
+      <p class="quote-field__note">Subject to approved cover for the declared value. Limits, exclusions and full terms apply.</p>
+    </div>
+
+    <div class="quote-field" id="gitCoverDetail" hidden>
+      <label for="goodsValueInput">Declared goods value (R)</label>
+      <input type="number" id="goodsValueInput" min="0" step="500" placeholder="e.g. 5000">
+      <p class="quote-field__note">Used to calculate the GIT cover request fee.</p>
+    </div>
+  </section>
+
+  <!-- ============ YOUR QUOTE ============ -->
+  <section class="quote-section">
     <h2 class="quote-step__title">Your quote</h2>
 
     <div class="quote-receipt" id="quoteReceipt">
-      <div class="quote-receipt__loading" id="quoteLoading">Calculating…</div>
+      <div class="quote-receipt__loading">Add your pickup, drop-off and truck above to see your price.</div>
     </div>
 
     <div class="quote-manual-quote" id="manualQuoteNotice" hidden>
@@ -216,7 +193,7 @@
       <a class="quote-btn quote-btn--filled" id="manualQuoteWhatsapp" href="#" target="_blank" rel="noopener">Message us on WhatsApp</a>
     </div>
 
-    <div id="quotePriceSection">
+    <div id="quotePriceSection" hidden>
       <p class="quote-disclosure">The deposit below is <strong>non-refundable</strong> and confirms your booking slot; the balance is settled with the team on move day. The final price may change if the actual items or access conditions differ materially from what you told us.</p>
 
       <div class="quote-checkout" id="quoteCheckout">
@@ -228,32 +205,56 @@
     </div>
   </section>
 
-  <!-- ============ CONFIRMATION ============ -->
-  <section class="quote-step quote-step--confirmation" data-step="confirmation" hidden>
-    <div class="quote-confirmation">
-      <div class="quote-confirmation__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <h2>Booking Confirmed</h2>
-      <p id="confirmationText">Your deposit has been received and your move is booked. We'll be in touch to confirm the details.</p>
-      <div class="quote-confirmation__actions">
-        <a class="btn btn--gold btn--lg" href="index.html">Back to Home</a>
-      </div>
-    </div>
-  </section>
-
 </main>
 
-<p class="quote-step-error" id="stepError" role="alert" hidden></p>
+<!-- ============ CONFIRMATION ============ -->
+<section class="quote-confirmation-screen" id="confirmationSection" hidden>
+  <div class="quote-confirmation">
+    <div class="quote-confirmation__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Booking Confirmed</h2>
+    <p id="confirmationText">Your deposit has been received and your move is booked. We'll be in touch to confirm the details.</p>
+    <div class="quote-confirmation__actions">
+      <a class="btn btn--gold btn--lg" href="index.html">Back to Home</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOAD ASSISTANT MODAL ============ -->
+<div class="quote-modal" id="loadAssistantModal" hidden>
+  <div class="quote-modal__backdrop" id="loadAssistantBackdrop"></div>
+  <div class="quote-modal__panel" role="dialog" aria-modal="true" aria-label="Load assistant">
+    <div class="quote-modal__header">
+      <h3>Load assistant</h3>
+      <button type="button" class="quote-modal__close" id="loadAssistantClose" aria-label="Close">×</button>
+    </div>
+    <p class="quote-step__hint">Add what you're moving and we'll recommend the right truck.</p>
+
+    <div class="quote-field">
+      <label>Bedroom</label>
+      <div class="quote-item-list" id="itemsBedroom"></div>
+    </div>
+    <div class="quote-field">
+      <label>Kitchen &amp; appliances</label>
+      <div class="quote-item-list" id="itemsKitchen"></div>
+    </div>
+    <div class="quote-field">
+      <label>Other</label>
+      <div class="quote-item-list" id="itemsOther"></div>
+    </div>
+
+    <p class="quote-volume-note" id="volumeNote"></p>
+
+    <button type="button" class="quote-btn quote-btn--filled" id="applyRecommendationBtn" disabled>Apply recommendation</button>
+  </div>
+</div>
+
+<p class="quote-form-error" id="formError" role="alert" hidden></p>
 
 <div class="quote-sticky-total" id="stickyTotal" hidden>
   <span class="quote-sticky-total__label">Total</span>
   <span class="quote-sticky-total__value" id="stickyTotalValue">R0</span>
-</div>
-
-<div class="quote-bottom-bar">
-  <button type="button" class="quote-btn quote-btn--outline" id="backBtn">Back</button>
-  <button type="button" class="quote-btn quote-btn--filled" id="nextBtn">Next</button>
 </div>
 
 <script>window.FOQ_CONFIG = {

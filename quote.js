@@ -1,30 +1,32 @@
 (() => {
   const CFG = window.FOQ_CONFIG;
-  const TOTAL_STEPS = 5;
 
   const state = {
-    step: 1,
     pickup: '',
     dropoff: '',
+    vehicleType: null,
     items: {},
+    additionalHelpers: 0,
     pickupFloor: 0,
     pickupElevator: false,
     pickupElevatorTooSmall: false,
     dropoffFloor: 0,
     dropoffElevator: false,
     dropoffElevatorTooSmall: false,
-    additionalHelpers: 0,
+    numberOfTrips: 1,
     packagingMaterials: false,
     packagingLabor: false,
-    goodsValue: 0,
-    specialItems: [],
     moveDate: '',
     timeSlot: null,
     phone: '',
+    gitCoverRequested: false,
+    goodsValue: 0,
     inZone: null,
     distanceKm: null,
     lastQuote: null,
     pricingConfig: null,
+    calViewYear: new Date().getFullYear(),
+    calViewMonth: new Date().getMonth(),
     sessionToken: localStorage.getItem('foq_session_token') || null,
     sessionName: localStorage.getItem('foq_session_name') || null,
   };
@@ -33,39 +35,52 @@
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   const els = {
-    steps: $$('.quote-step[data-step]'),
-    confirmation: $('.quote-step--confirmation'),
-    progressSteps: $$('.quote-progress__step'),
-    backBtn: $('#backBtn'),
-    nextBtn: $('#nextBtn'),
+    quoteMain: $('#quoteMain'),
+    confirmation: $('#confirmationSection'),
     stickyTotal: $('#stickyTotal'),
     stickyTotalValue: $('#stickyTotalValue'),
-    pickupSelect: $('#pickupSelect'),
-    pickupOther: $('#pickupOther'),
+    pickupInput: $('#pickupInput'),
     dropoffInput: $('#dropoffInput'),
     zoneStatus: $('#zoneStatus'),
+    vehicleCards: $('#vehicleCards'),
+    loadAssistantTrigger: $('#loadAssistantTrigger'),
+    loadAssistantModal: $('#loadAssistantModal'),
+    loadAssistantBackdrop: $('#loadAssistantBackdrop'),
+    loadAssistantClose: $('#loadAssistantClose'),
+    applyRecommendationBtn: $('#applyRecommendationBtn'),
     itemsBedroom: $('#itemsBedroom'),
     itemsKitchen: $('#itemsKitchen'),
     itemsOther: $('#itemsOther'),
     volumeNote: $('#volumeNote'),
-    goodsValueInput: $('#goodsValueInput'),
-    specialItemsList: $('#specialItemsList'),
-    pickupFloorSelect: $('#pickupFloorSelect'),
-    pickupLiftToggle: $('#pickupLiftToggle'),
-    pickupLiftTooSmall: $('#pickupLiftTooSmall'),
-    dropoffFloorSelect: $('#dropoffFloorSelect'),
-    dropoffLiftToggle: $('#dropoffLiftToggle'),
-    dropoffLiftTooSmall: $('#dropoffLiftTooSmall'),
-    packagingMaterials: $('#packagingMaterials'),
-    packagingLabor: $('#packagingLabor'),
-    materialsFee: $('#materialsFee'),
-    laborFee: $('#laborFee'),
     helpersMinus: $('#helpersMinus'),
     helpersPlus: $('#helpersPlus'),
     helpersValue: $('#helpersValue'),
     helperNote: $('#helperNote'),
-    moveDate: $('#moveDate'),
+    pickupFloorSelect: $('#pickupFloorSelect'),
+    pickupLiftToggle: $('#pickupLiftToggle'),
+    pickupLiftTooSmall: $('#pickupLiftTooSmall'),
+    pickupAccessPreview: $('#pickupAccessPreview'),
+    dropoffFloorSelect: $('#dropoffFloorSelect'),
+    dropoffLiftToggle: $('#dropoffLiftToggle'),
+    dropoffLiftTooSmall: $('#dropoffLiftTooSmall'),
+    dropoffAccessPreview: $('#dropoffAccessPreview'),
+    tripsMinus: $('#tripsMinus'),
+    tripsPlus: $('#tripsPlus'),
+    tripsValue: $('#tripsValue'),
+    packagingMaterials: $('#packagingMaterials'),
+    packagingLabor: $('#packagingLabor'),
+    materialsFee: $('#materialsFee'),
+    laborFee: $('#laborFee'),
+    moveDateTrigger: $('#moveDateTrigger'),
+    moveDateCalendar: $('#moveDateCalendar'),
+    calPrevMonth: $('#calPrevMonth'),
+    calNextMonth: $('#calNextMonth'),
+    calMonthLabel: $('#calMonthLabel'),
+    calGrid: $('#calGrid'),
     phoneInput: $('#phoneInput'),
+    gitCoverToggle: $('#gitCoverToggle'),
+    gitCoverDetail: $('#gitCoverDetail'),
+    goodsValueInput: $('#goodsValueInput'),
     quoteReceipt: $('#quoteReceipt'),
     manualQuoteNotice: $('#manualQuoteNotice'),
     manualQuoteText: $('#manualQuoteText'),
@@ -76,118 +91,40 @@
     payDepositBtn: $('#payDepositBtn'),
     whatsappFallback: $('#whatsappFallback'),
     confirmationText: $('#confirmationText'),
-    stepError: $('#stepError'),
+    formError: $('#formError'),
   };
 
   const MAX_ADDITIONAL_HELPERS = 10;
+  const MAX_TRIPS = 5;
   const GROUP_CONTAINERS = { bedroom: els.itemsBedroom, kitchen: els.itemsKitchen, other: els.itemsOther };
+  const VEHICLE_BLURBS = {
+    '1_3_ton': "Best for a single room or a light student move.",
+    '1_3_ton_trailer': 'Extra capacity for a full room plus furniture.',
+    '4_ton': 'For a 1–2 bedroom apartment or a heavier load.',
+    '8_ton': 'Large household or multi-bedroom relocations.',
+  };
+  let lastRecommendedVehicle = null;
 
   const todayISO = () => new Date().toISOString().slice(0, 10);
-  els.moveDate.min = todayISO();
 
-  /* ---------------------------------------------------------------- */
-  /* Step navigation                                                   */
-  /* ---------------------------------------------------------------- */
-
-  function renderProgress() {
-    els.progressSteps.forEach((el) => {
-      const n = Number(el.dataset.stepIndicator);
-      el.removeAttribute('data-active');
-      el.removeAttribute('data-complete');
-      if (n < state.step) el.setAttribute('data-complete', '');
-      if (n === state.step) el.setAttribute('data-active', '');
-    });
+  function showFormError(message) {
+    els.formError.textContent = message;
+    els.formError.hidden = false;
   }
-
-  function showStep(n) {
-    clearStepError();
-    const activeSection = els.steps.find((el) => Number(el.dataset.step) === n);
-    els.steps.forEach((el) => {
-      el.hidden = Number(el.dataset.step) !== n;
-    });
-    if (activeSection) {
-      activeSection.classList.remove('quote-step--entering');
-      void activeSection.offsetHeight; // force reflow so the entrance animation restarts on every step change
-      activeSection.classList.add('quote-step--entering');
-    }
-    renderProgress();
-    els.stickyTotal.hidden = n < 2;
-    els.backBtn.disabled = n === 1;
-    els.nextBtn.textContent = n === TOTAL_STEPS ? 'Done' : 'Next';
-    els.nextBtn.style.display = n === TOTAL_STEPS ? 'none' : '';
-    els.backBtn.style.display = n === TOTAL_STEPS ? 'none' : '';
-    if (n === TOTAL_STEPS) fetchQuotePreview();
+  function clearFormError() {
+    els.formError.hidden = true;
   }
 
   function totalItemCount() {
     return Object.values(state.items).reduce((sum, qty) => sum + qty, 0);
   }
 
-  function validateStep(n) {
-    if (n === 1) return state.inZone === true;
-    if (n === 2) return totalItemCount() > 0;
-    if (n === 4) return state.moveDate && state.timeSlot && state.phone.trim().length >= 7;
-    return true;
-  }
-
-  function showStepError(message) {
-    els.stepError.textContent = message;
-    els.stepError.hidden = false;
-  }
-  function clearStepError() {
-    els.stepError.hidden = true;
-  }
-
-  function explainBlockedStep(n) {
-    if (n === 1) {
-      if (!state.pickup || !state.dropoff) {
-        els.zoneStatus.textContent = 'Select both a pickup and drop-off location to continue.';
-      } else if (state.inZone === null) {
-        els.zoneStatus.textContent = 'Still checking that route — one moment…';
-      } else if (state.inZone === false) {
-        els.zoneStatus.textContent = "That route isn't in our Hatfield service area yet — try a different address, or contact us directly.";
-      }
-      els.zoneStatus.setAttribute('data-state', 'error');
-    }
-    if (n === 2 && totalItemCount() === 0) {
-      showStepError('Add at least one item before continuing.');
-    }
-    if (n === 4 && !(state.moveDate && state.timeSlot && state.phone.trim().length >= 7)) {
-      showStepError('Add a move date, time slot and a valid phone number before continuing.');
-    }
-  }
-
-  els.nextBtn.addEventListener('click', () => {
-    if (!validateStep(state.step)) {
-      explainBlockedStep(state.step);
-      return;
-    }
-    if (state.step < TOTAL_STEPS) {
-      state.step += 1;
-      showStep(state.step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
-  els.backBtn.addEventListener('click', () => {
-    if (state.step > 1) {
-      state.step -= 1;
-      showStep(state.step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
-
   /* ---------------------------------------------------------------- */
-  /* Step 1: Route                                                     */
+  /* Route                                                              */
   /* ---------------------------------------------------------------- */
 
-  els.pickupSelect.addEventListener('change', () => {
-    const isOther = els.pickupSelect.value === '__other__';
-    els.pickupOther.style.display = isOther ? '' : 'none';
-    state.pickup = isOther ? els.pickupOther.value.trim() : els.pickupSelect.value;
-    maybeCheckZone();
-  });
-  els.pickupOther.addEventListener('change', () => {
-    state.pickup = els.pickupOther.value.trim();
+  els.pickupInput.addEventListener('change', () => {
+    state.pickup = els.pickupInput.value.trim();
     maybeCheckZone();
   });
   els.dropoffInput.addEventListener('change', () => {
@@ -229,26 +166,57 @@
       els.zoneStatus.textContent = err.message || 'Something went wrong checking that route.';
       els.zoneStatus.setAttribute('data-state', 'error');
     }
+    refreshLiveTotal();
   }
 
   /* ---------------------------------------------------------------- */
-  /* Step 2: Belongings (package + itemized inventory)                 */
+  /* Truck selection + load assistant                                  */
   /* ---------------------------------------------------------------- */
 
-  function wireRadioCards(field, onChange) {
-    const group = $(`.quote-radio-cards[data-field="${field}"]`);
-    if (!group) return;
-    group.querySelectorAll('.quote-radio-card').forEach((btn) => {
-      btn.setAttribute('aria-pressed', 'false');
-      btn.addEventListener('click', () => {
-        group.querySelectorAll('.quote-radio-card').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-        btn.setAttribute('aria-pressed', 'true');
-        state[field] = btn.dataset.value;
-        if (onChange) onChange(btn.dataset.value);
-        refreshLiveTotal();
-      });
+  function renderVehicleCards() {
+    const vehicles = state.pricingConfig?.vehicles;
+    if (!vehicles) return;
+    els.vehicleCards.innerHTML = '';
+    Object.entries(vehicles).forEach(([key, def]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quote-radio-card';
+      btn.dataset.value = key;
+      btn.setAttribute('aria-pressed', state.vehicleType === key ? 'true' : 'false');
+      btn.innerHTML = `
+        <strong>${def.label}</strong>
+        <span>${VEHICLE_BLURBS[key] || ''}</span>
+        <span class="quote-radio-card__price">from R${def.baseFare}</span>
+      `;
+      btn.addEventListener('click', () => selectVehicle(key));
+      els.vehicleCards.appendChild(btn);
     });
   }
+
+  function selectVehicle(key) {
+    state.vehicleType = key;
+    $$('#vehicleCards .quote-radio-card').forEach((c) => {
+      c.setAttribute('aria-pressed', c.dataset.value === key ? 'true' : 'false');
+    });
+    refreshLiveTotal();
+  }
+
+  function openLoadAssistant() {
+    els.loadAssistantModal.hidden = false;
+  }
+  function closeLoadAssistant() {
+    els.loadAssistantModal.hidden = true;
+  }
+  els.loadAssistantTrigger.addEventListener('click', openLoadAssistant);
+  els.loadAssistantClose.addEventListener('click', closeLoadAssistant);
+  els.loadAssistantBackdrop.addEventListener('click', closeLoadAssistant);
+
+  els.applyRecommendationBtn.addEventListener('click', () => {
+    if (lastRecommendedVehicle) {
+      selectVehicle(lastRecommendedVehicle);
+    }
+    closeLoadAssistant();
+  });
 
   function renderItemCatalog() {
     const catalog = state.pricingConfig?.itemCatalog;
@@ -280,7 +248,6 @@
         row.dataset.qty = String(qty);
         minusBtn.disabled = qty <= 0;
         updateVolumeNote();
-        refreshLiveTotal();
       };
 
       minusBtn.addEventListener('click', () => setQty((state.items[key] || 0) - 1));
@@ -294,69 +261,30 @@
   function updateVolumeNote() {
     const catalog = state.pricingConfig?.itemCatalog;
     const vehicles = state.pricingConfig?.vehicles;
-    if (!catalog || !vehicles) {
-      els.volumeNote.textContent = '';
-      return;
-    }
+    if (!catalog || !vehicles) { els.volumeNote.textContent = ''; return; }
     const count = totalItemCount();
     if (count === 0) {
       els.volumeNote.textContent = '';
+      lastRecommendedVehicle = null;
+      els.applyRecommendationBtn.disabled = true;
       return;
     }
     const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
-    const match = Object.values(vehicles).find((v) => volume <= v.volumeThreshold);
-    const vehicleLabel = match ? match.label : "a load we'll need to quote personally";
-    els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${vehicleLabel} will do it.`;
+    const match = Object.entries(vehicles).find(([, v]) => volume <= v.volumeThreshold);
+    if (match) {
+      lastRecommendedVehicle = match[0];
+      els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${match[1].label} will do it.`;
+      els.applyRecommendationBtn.disabled = false;
+    } else {
+      lastRecommendedVehicle = null;
+      els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — that's more than our largest truck handles; we'll need to quote this one personally.`;
+      els.applyRecommendationBtn.disabled = true;
+    }
   }
 
-  els.goodsValueInput.addEventListener('input', () => {
-    state.goodsValue = Number(els.goodsValueInput.value) || 0;
-    refreshLiveTotal();
-  });
-
-  $$('#specialItemsList input[type="checkbox"]').forEach((cb) => {
-    cb.addEventListener('change', () => {
-      state.specialItems = $$('#specialItemsList input[type="checkbox"]:checked').map((el) => el.value);
-      refreshLiveTotal();
-    });
-  });
-
   /* ---------------------------------------------------------------- */
-  /* Step 3: Access                                                    */
+  /* Move requirements                                                  */
   /* ---------------------------------------------------------------- */
-
-  els.pickupFloorSelect.addEventListener('change', () => {
-    state.pickupFloor = Number(els.pickupFloorSelect.value);
-    refreshLiveTotal();
-  });
-  els.pickupLiftToggle.addEventListener('change', () => {
-    state.pickupElevator = els.pickupLiftToggle.checked;
-    refreshLiveTotal();
-  });
-  els.pickupLiftTooSmall.addEventListener('change', () => {
-    state.pickupElevatorTooSmall = els.pickupLiftTooSmall.checked;
-    refreshLiveTotal();
-  });
-  els.dropoffFloorSelect.addEventListener('change', () => {
-    state.dropoffFloor = Number(els.dropoffFloorSelect.value);
-    refreshLiveTotal();
-  });
-  els.dropoffLiftToggle.addEventListener('change', () => {
-    state.dropoffElevator = els.dropoffLiftToggle.checked;
-    refreshLiveTotal();
-  });
-  els.dropoffLiftTooSmall.addEventListener('change', () => {
-    state.dropoffElevatorTooSmall = els.dropoffLiftTooSmall.checked;
-    refreshLiveTotal();
-  });
-  els.packagingMaterials.addEventListener('change', () => {
-    state.packagingMaterials = els.packagingMaterials.checked;
-    refreshLiveTotal();
-  });
-  els.packagingLabor.addEventListener('change', () => {
-    state.packagingLabor = els.packagingLabor.checked;
-    refreshLiveTotal();
-  });
 
   function updateHelpersButtons() {
     els.helpersValue.textContent = state.additionalHelpers;
@@ -374,18 +302,183 @@
     refreshLiveTotal();
   });
 
+  function updateTripsButtons() {
+    els.tripsValue.textContent = state.numberOfTrips;
+    els.tripsMinus.disabled = state.numberOfTrips <= 1;
+    els.tripsPlus.disabled = state.numberOfTrips >= MAX_TRIPS;
+  }
+  els.tripsMinus.addEventListener('click', () => {
+    state.numberOfTrips = Math.max(1, state.numberOfTrips - 1);
+    updateTripsButtons();
+    refreshLiveTotal();
+  });
+  els.tripsPlus.addEventListener('click', () => {
+    state.numberOfTrips = Math.min(MAX_TRIPS, state.numberOfTrips + 1);
+    updateTripsButtons();
+    refreshLiveTotal();
+  });
+
+  function updateAccessPreview() {
+    const cfg = state.pricingConfig;
+    if (!cfg) return;
+    const describe = (floorSelect, floor, elevator, tooSmall) => {
+      const effectiveElevator = elevator && !tooSmall;
+      const floorText = floorSelect.options[floorSelect.selectedIndex]?.text || 'Ground';
+      const floorLabel = floor === 0 ? floorText : `${floorText} floor`;
+      const amount = effectiveElevator ? cfg.elevatorSurcharge : floor * cfg.floorRate;
+      const accessLabel = effectiveElevator ? 'elevator' : 'no elevator';
+      return `${floorLabel}, ${accessLabel} → +R${amount}`;
+    };
+    els.pickupAccessPreview.textContent = describe(els.pickupFloorSelect, state.pickupFloor, state.pickupElevator, state.pickupElevatorTooSmall);
+    els.dropoffAccessPreview.textContent = describe(els.dropoffFloorSelect, state.dropoffFloor, state.dropoffElevator, state.dropoffElevatorTooSmall);
+  }
+
+  els.pickupFloorSelect.addEventListener('change', () => {
+    state.pickupFloor = Number(els.pickupFloorSelect.value);
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.pickupLiftToggle.addEventListener('change', () => {
+    state.pickupElevator = els.pickupLiftToggle.checked;
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.pickupLiftTooSmall.addEventListener('change', () => {
+    state.pickupElevatorTooSmall = els.pickupLiftTooSmall.checked;
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.dropoffFloorSelect.addEventListener('change', () => {
+    state.dropoffFloor = Number(els.dropoffFloorSelect.value);
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.dropoffLiftToggle.addEventListener('change', () => {
+    state.dropoffElevator = els.dropoffLiftToggle.checked;
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.dropoffLiftTooSmall.addEventListener('change', () => {
+    state.dropoffElevatorTooSmall = els.dropoffLiftTooSmall.checked;
+    updateAccessPreview();
+    refreshLiveTotal();
+  });
+  els.packagingMaterials.addEventListener('change', () => {
+    state.packagingMaterials = els.packagingMaterials.checked;
+    refreshLiveTotal();
+  });
+  els.packagingLabor.addEventListener('change', () => {
+    state.packagingLabor = els.packagingLabor.checked;
+    refreshLiveTotal();
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Schedule                                                           */
+  /* ---------------------------------------------------------------- */
+
+  function wireRadioCards(field, onChange) {
+    const group = $(`.quote-radio-cards[data-field="${field}"]`);
+    if (!group) return;
+    group.querySelectorAll('.quote-radio-card').forEach((btn) => {
+      btn.setAttribute('aria-pressed', 'false');
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.quote-radio-card').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        state[field] = btn.dataset.value;
+        if (onChange) onChange(btn.dataset.value);
+        refreshLiveTotal();
+      });
+    });
+  }
   wireRadioCards('timeSlot');
 
-  els.moveDate.addEventListener('change', () => { state.moveDate = els.moveDate.value; });
   els.phoneInput.addEventListener('input', () => { state.phone = els.phoneInput.value; });
 
+  function formatDateLabel(iso) {
+    const d = new Date(`${iso}T00:00:00`);
+    return d.toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function renderCalendarGrid() {
+    const first = new Date(state.calViewYear, state.calViewMonth, 1);
+    const daysInMonth = new Date(state.calViewYear, state.calViewMonth + 1, 0).getDate();
+    const startWeekday = first.getDay();
+    els.calMonthLabel.textContent = first.toLocaleDateString('en-ZA', { month: 'long', year: 'numeric' });
+
+    const todayIso = todayISO();
+    els.calGrid.innerHTML = '';
+    for (let i = 0; i < startWeekday; i++) {
+      const blank = document.createElement('span');
+      blank.className = 'quote-calendar__day quote-calendar__day--blank';
+      els.calGrid.appendChild(blank);
+    }
+    for (let day = 1; day <= daysInMonth; day++) {
+      const iso = `${state.calViewYear}-${String(state.calViewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'quote-calendar__day';
+      btn.textContent = day;
+      if (iso < todayIso) btn.disabled = true;
+      if (iso === state.moveDate) btn.setAttribute('data-selected', '');
+      if (iso === todayIso) btn.setAttribute('data-today', '');
+      btn.addEventListener('click', () => {
+        state.moveDate = iso;
+        els.moveDateTrigger.textContent = formatDateLabel(iso);
+        els.moveDateCalendar.hidden = true;
+        refreshLiveTotal();
+      });
+      els.calGrid.appendChild(btn);
+    }
+  }
+
+  els.moveDateTrigger.addEventListener('click', () => {
+    els.moveDateCalendar.hidden = !els.moveDateCalendar.hidden;
+    if (!els.moveDateCalendar.hidden) renderCalendarGrid();
+  });
+  els.calPrevMonth.addEventListener('click', () => {
+    state.calViewMonth -= 1;
+    if (state.calViewMonth < 0) { state.calViewMonth = 11; state.calViewYear -= 1; }
+    renderCalendarGrid();
+  });
+  els.calNextMonth.addEventListener('click', () => {
+    state.calViewMonth += 1;
+    if (state.calViewMonth > 11) { state.calViewMonth = 0; state.calViewYear += 1; }
+    renderCalendarGrid();
+  });
+  document.addEventListener('click', (e) => {
+    if (!els.moveDateCalendar.hidden && !els.moveDateCalendar.contains(e.target) && e.target !== els.moveDateTrigger) {
+      els.moveDateCalendar.hidden = true;
+    }
+  });
+
   /* ---------------------------------------------------------------- */
-  /* Live total (steps 2+)                                             */
+  /* Goods in Transit cover + special items                            */
   /* ---------------------------------------------------------------- */
+
+  els.gitCoverToggle.addEventListener('change', () => {
+    state.gitCoverRequested = els.gitCoverToggle.checked;
+    els.gitCoverDetail.hidden = !state.gitCoverRequested;
+    if (!state.gitCoverRequested) {
+      state.goodsValue = 0;
+      els.goodsValueInput.value = '';
+    }
+    refreshLiveTotal();
+  });
+  els.goodsValueInput.addEventListener('input', () => {
+    state.goodsValue = Number(els.goodsValueInput.value) || 0;
+    refreshLiveTotal();
+  });
+
+  /* ---------------------------------------------------------------- */
+  /* Live quote                                                         */
+  /* ---------------------------------------------------------------- */
+
+  function canQuote() {
+    return state.inZone === true && !!state.vehicleType;
+  }
 
   let liveTotalTimer = null;
   function refreshLiveTotal() {
-    if (state.step < 2 || !state.pickup || !state.dropoff || totalItemCount() === 0) return;
     clearTimeout(liveTotalTimer);
     liveTotalTimer = setTimeout(fetchQuotePreview, 350);
   }
@@ -394,6 +487,7 @@
     return {
       pickup: state.pickup,
       dropoff: state.dropoff,
+      vehicleType: state.vehicleType,
       items: state.items,
       pickupFloor: state.pickupFloor,
       pickupElevator: state.pickupElevator,
@@ -402,16 +496,26 @@
       dropoffElevator: state.dropoffElevator,
       dropoffElevatorTooSmall: state.dropoffElevatorTooSmall,
       additionalHelpers: state.additionalHelpers,
+      numberOfTrips: state.numberOfTrips,
       packagingMaterials: state.packagingMaterials,
       packagingLabor: state.packagingLabor,
       goodsValue: state.goodsValue,
-      specialItems: state.specialItems.reduce((obj, key) => { obj[key] = true; return obj; }, {}),
       moveDate: state.moveDate || todayISO(),
     };
   }
 
+  function showReceiptPlaceholder(message) {
+    els.manualQuoteNotice.hidden = true;
+    els.quotePriceSection.hidden = true;
+    els.quoteReceipt.innerHTML = `<div class="quote-receipt__loading">${message}</div>`;
+    els.stickyTotal.hidden = true;
+  }
+
   async function fetchQuotePreview() {
-    if (totalItemCount() === 0) return;
+    if (!canQuote()) {
+      showReceiptPlaceholder('Add your pickup, drop-off and truck above to see your price.');
+      return;
+    }
     try {
       const res = await fetch(`${CFG.apiBase}/quote-preview`, {
         method: 'POST',
@@ -419,15 +523,23 @@
         body: JSON.stringify(moveInputPayload()),
       });
       const data = await res.json();
-      if (!res.ok || data.inZone === false) return;
+      if (!res.ok) {
+        showReceiptPlaceholder(data.message || "We couldn't calculate a price for that — check the details above.");
+        return;
+      }
+      if (data.inZone === false) {
+        showReceiptPlaceholder("That's outside our current Hatfield service area — contact us directly.");
+        return;
+      }
 
       state.lastQuote = data;
+      els.stickyTotal.hidden = false;
       if (!data.requiresManualQuote) {
         els.stickyTotalValue.textContent = `R${Math.round(data.finalPrice)}`;
       } else {
         els.stickyTotalValue.textContent = 'Custom quote';
       }
-      if (state.step === TOTAL_STEPS) renderReceipt(data);
+      renderReceipt(data);
     } catch (err) {
       /* silent — live total is a nice-to-have, not blocking */
     }
@@ -438,8 +550,10 @@
       const res = await fetch(`${CFG.apiBase}/pricing-config`);
       if (!res.ok) return;
       state.pricingConfig = await res.json();
+      renderVehicleCards();
       renderItemCatalog();
       applyPricingHints();
+      updateAccessPreview();
     } catch (err) {
       /* fee hints/inventory list need this; retry isn't critical enough to loop on */
     }
@@ -459,6 +573,7 @@
       els.manualQuoteText.textContent = data.reason || "This one needs a proper look before we can price it.";
       els.manualQuoteNotice.hidden = false;
       els.quotePriceSection.hidden = true;
+      els.quoteReceipt.innerHTML = '';
       return;
     }
     els.manualQuoteNotice.hidden = true;
@@ -476,6 +591,20 @@
       <div class="quote-receipt__deposit"><span>Deposit due now (50%)</span><span>R${Math.round(data.depositAmount)}</span></div>
       <div class="quote-receipt__balance"><span>Balance on move day</span><span>R${Math.round(data.balanceAmount)}</span></div>
     `;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Form validation (checked at pay time, since this is a single form) */
+  /* ---------------------------------------------------------------- */
+
+  function validateForm() {
+    const missing = [];
+    if (state.inZone !== true) missing.push('a pickup and drop-off address inside our Hatfield service area');
+    if (!state.vehicleType) missing.push('a truck (pick one, or use the load assistant)');
+    if (!state.moveDate) missing.push('a move date');
+    if (!state.timeSlot) missing.push('a time slot');
+    if (!state.phone || state.phone.trim().length < 7) missing.push('a valid phone number');
+    return missing;
   }
 
   /* ---------------------------------------------------------------- */
@@ -529,6 +658,13 @@
 
   els.payDepositBtn.addEventListener('click', async () => {
     if (!state.sessionToken) return;
+    const missing = validateForm();
+    if (missing.length) {
+      showFormError(`Please add ${missing.join(', ')} before paying.`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    clearFormError();
     els.payDepositBtn.disabled = true;
     els.payDepositBtn.textContent = 'Redirecting…';
     try {
@@ -557,7 +693,7 @@
     } catch (err) {
       els.payDepositBtn.disabled = false;
       els.payDepositBtn.textContent = 'Pay Deposit with PayFast';
-      showStepError(err.message || 'Something went wrong, please try again.');
+      showFormError(err.message || 'Something went wrong, please try again.');
     }
   });
 
@@ -623,10 +759,8 @@
   }
 
   function showConfirmation() {
-    els.steps.forEach((el) => { el.hidden = true; });
-    document.querySelector('.quote-progress').hidden = true;
+    els.quoteMain.hidden = true;
     els.stickyTotal.hidden = true;
-    document.querySelector('.quote-bottom-bar').hidden = true;
     els.confirmation.hidden = false;
   }
 
@@ -641,12 +775,12 @@
     const bounds = new google.maps.Circle({ center, radius: 4000 }).getBounds();
     const options = { bounds, strictBounds: false, componentRestrictions: { country: 'za' } };
 
-    new google.maps.places.Autocomplete(els.dropoffInput, options).addListener('place_changed', () => {
-      state.dropoff = els.dropoffInput.value.trim();
+    new google.maps.places.Autocomplete(els.pickupInput, options).addListener('place_changed', () => {
+      state.pickup = els.pickupInput.value.trim();
       maybeCheckZone();
     });
-    new google.maps.places.Autocomplete(els.pickupOther, options).addListener('place_changed', () => {
-      state.pickup = els.pickupOther.value.trim();
+    new google.maps.places.Autocomplete(els.dropoffInput, options).addListener('place_changed', () => {
+      state.dropoff = els.dropoffInput.value.trim();
       maybeCheckZone();
     });
   }
@@ -669,12 +803,13 @@
 
   async function boot() {
     updateHelpersButtons();
+    updateTripsButtons();
     updateCheckoutUI();
+    showReceiptPlaceholder('Add your pickup, drop-off and truck above to see your price.');
 
     const handledReturn = await checkReturnStatus();
     if (handledReturn) return;
 
-    showStep(1);
     updateWhatsappFallback();
     setInterval(updateWhatsappFallback, 1000);
     loadPricingConfig();
