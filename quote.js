@@ -361,7 +361,7 @@
       const effectiveElevator = elevator && !tooSmall;
       const floorText = floorSelect.options[floorSelect.selectedIndex]?.text || 'Ground';
       const floorLabel = floor === 0 ? floorText : `${floorText} floor`;
-      const amount = effectiveElevator ? cfg.elevatorSurcharge : floor * cfg.floorRate;
+      const amount = effectiveElevator ? cfg.elevatorSurcharge : (floor > 0 ? cfg.floorRate : 0);
       const accessLabel = effectiveElevator ? 'elevator' : 'no elevator';
       return `${floorLabel}, ${accessLabel} → +R${amount}`;
     };
