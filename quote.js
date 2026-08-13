@@ -55,9 +55,11 @@
     itemsOutdoor: $('#itemsOutdoor'),
     itemsOther: $('#itemsOther'),
     idealTruckValue: $('#idealTruckValue'),
+    recommendedTruckDetailValue: $('#recommendedTruckDetailValue'),
+    suggestedHelpersDetailValue: $('#suggestedHelpersDetailValue'),
+    estimatedVolumeValue: $('#estimatedVolumeValue'),
     recommendedTruckValue: $('#recommendedTruckValue'),
     suggestedHelpersValue: $('#suggestedHelpersValue'),
-    estimatedVolumeValue: $('#estimatedVolumeValue'),
     helpersMinus: $('#helpersMinus'),
     helpersPlus: $('#helpersPlus'),
     helpersValue: $('#helpersValue'),
@@ -292,8 +294,10 @@
 
     if (totalItemCount() === 0) {
       els.idealTruckValue.textContent = 'Add items to get a recommendation';
+      els.recommendedTruckDetailValue.textContent = 'Add items to get a recommendation';
+      els.suggestedHelpersDetailValue.textContent = '0';
       els.recommendedTruckValue.textContent = 'Add items to get a recommendation';
-      els.suggestedHelpersValue.textContent = '0';
+      els.suggestedHelpersValue.textContent = '0 helpers';
       lastRecommendedVehicle = null;
       lastSuggestedHelpers = 0;
       els.applyRecommendationBtn.disabled = true;
@@ -304,14 +308,19 @@
     if (match) {
       lastRecommendedVehicle = match[0];
       lastSuggestedHelpers = suggestedAdditionalHelpers(volume);
+      const helpersLabel = `${lastSuggestedHelpers} helper${lastSuggestedHelpers === 1 ? '' : 's'}`;
       els.idealTruckValue.textContent = match[1].label;
+      els.recommendedTruckDetailValue.textContent = match[1].label;
+      els.suggestedHelpersDetailValue.textContent = String(lastSuggestedHelpers);
       els.recommendedTruckValue.textContent = match[1].label;
-      els.suggestedHelpersValue.textContent = String(lastSuggestedHelpers);
+      els.suggestedHelpersValue.textContent = helpersLabel;
       els.applyRecommendationBtn.disabled = false;
     } else {
       lastRecommendedVehicle = null;
       lastSuggestedHelpers = 0;
       els.idealTruckValue.textContent = "That's bigger than our largest truck — we'll quote this one personally.";
+      els.recommendedTruckDetailValue.textContent = 'Manual quote required';
+      els.suggestedHelpersDetailValue.textContent = '—';
       els.recommendedTruckValue.textContent = 'Manual quote required';
       els.suggestedHelpersValue.textContent = '—';
       els.applyRecommendationBtn.disabled = true;

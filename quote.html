@@ -24,6 +24,7 @@
 </header>
 
 <main class="quote-main" id="quoteMain">
+<div class="quote-main__form">
 
   <!-- ============ ROUTE ============ -->
   <section class="quote-section">
@@ -180,9 +181,12 @@
     </div>
   </section>
 
+</div>
+<div class="quote-main__summary">
   <!-- ============ YOUR QUOTE ============ -->
-  <section class="quote-section">
+  <section class="quote-section quote-section--summary">
     <h2 class="quote-step__title">Your quote</h2>
+    <p class="quote-step__hint">Live price preview for this request.</p>
 
     <div class="quote-receipt" id="quoteReceipt">
       <div class="quote-receipt__loading">Add your pickup, drop-off and truck above to see your price.</div>
@@ -204,7 +208,7 @@
       </div>
     </div>
   </section>
-
+</div>
 </main>
 
 <!-- ============ CONFIRMATION ============ -->
@@ -224,46 +228,56 @@
 <!-- ============ LOAD ASSISTANT MODAL ============ -->
 <div class="quote-modal" id="loadAssistantModal" hidden>
   <div class="quote-modal__backdrop" id="loadAssistantBackdrop"></div>
-  <div class="quote-modal__panel" role="dialog" aria-modal="true" aria-label="Load assistant">
+  <div class="quote-modal__panel" role="dialog" aria-modal="true" aria-label="Household load assistant">
     <div class="quote-modal__header">
-      <h3>Load assistant</h3>
+      <h3>Household load assistant</h3>
       <button type="button" class="quote-modal__close" id="loadAssistantClose" aria-label="Close">×</button>
     </div>
-    <p class="quote-step__hint">Add what you're moving and we'll recommend the right truck.</p>
 
-    <div class="quote-field">
-      <label>Bedroom</label>
-      <div class="quote-item-list" id="itemsBedroom"></div>
-    </div>
-    <div class="quote-field">
-      <label>Kitchen</label>
-      <div class="quote-item-list" id="itemsKitchen"></div>
-    </div>
-    <div class="quote-field">
-      <label>Living area</label>
-      <div class="quote-item-list" id="itemsLiving"></div>
-    </div>
-    <div class="quote-field">
-      <label>Office / Study</label>
-      <div class="quote-item-list" id="itemsOffice"></div>
-    </div>
-    <div class="quote-field">
-      <label>Outdoor</label>
-      <div class="quote-item-list" id="itemsOutdoor"></div>
-    </div>
-    <div class="quote-field">
-      <label>Other</label>
-      <div class="quote-item-list" id="itemsOther"></div>
+    <div class="quote-modal__body">
+      <p class="quote-step__hint">Add quantities to get a truck recommendation.</p>
+
+      <div class="quote-field">
+        <label>Bedroom</label>
+        <div class="quote-item-list" id="itemsBedroom"></div>
+      </div>
+      <div class="quote-field">
+        <label>Kitchen</label>
+        <div class="quote-item-list" id="itemsKitchen"></div>
+      </div>
+      <div class="quote-field">
+        <label>Living area</label>
+        <div class="quote-item-list" id="itemsLiving"></div>
+      </div>
+      <div class="quote-field">
+        <label>Office / Study</label>
+        <div class="quote-item-list" id="itemsOffice"></div>
+      </div>
+      <div class="quote-field">
+        <label>Outdoor</label>
+        <div class="quote-item-list" id="itemsOutdoor"></div>
+      </div>
+      <div class="quote-field">
+        <label>Other</label>
+        <div class="quote-item-list" id="itemsOther"></div>
+      </div>
+
+      <div class="quote-load-summary" id="loadSummary">
+        <div class="quote-load-summary__row"><span>Ideal truck</span><strong id="idealTruckValue">Add items to get a recommendation</strong></div>
+        <div class="quote-load-summary__row"><span>Recommended truck</span><strong id="recommendedTruckDetailValue">Add items to get a recommendation</strong></div>
+        <div class="quote-load-summary__row"><span>Suggested helpers</span><strong id="suggestedHelpersDetailValue">0</strong></div>
+        <div class="quote-load-summary__row"><span>Estimated volume</span><strong id="estimatedVolumeValue">0.0 units</strong></div>
+      </div>
     </div>
 
-    <div class="quote-load-summary" id="loadSummary">
-      <div class="quote-load-summary__row"><span>Ideal truck</span><span id="idealTruckValue">Add items to get a recommendation</span></div>
-      <div class="quote-load-summary__row"><span>Recommended truck</span><span id="recommendedTruckValue">Add items to get a recommendation</span></div>
-      <div class="quote-load-summary__row"><span>Suggested helpers</span><span id="suggestedHelpersValue">0</span></div>
-      <div class="quote-load-summary__row"><span>Estimated load</span><span id="estimatedVolumeValue">0.0 units</span></div>
+    <div class="quote-modal__footer">
+      <div class="quote-modal__recommendation">
+        <span class="quote-modal__recommendation-label">Recommended</span>
+        <strong id="recommendedTruckValue">Add items to get a recommendation</strong>
+        <span id="suggestedHelpersValue">0 helpers</span>
+      </div>
+      <button type="button" class="quote-btn quote-btn--filled" id="applyRecommendationBtn" disabled>Apply recommendation</button>
     </div>
-
-    <button type="button" class="quote-btn quote-btn--filled" id="applyRecommendationBtn" disabled>Apply recommendation</button>
   </div>
 </div>
 
