@@ -134,7 +134,7 @@
   <!-- ============ SCHEDULE ============ -->
   <section class="quote-section">
     <h2 class="quote-step__title">Schedule</h2>
-    <p class="quote-step__hint">Same-day and next-day bookings are fine — a rush fee applies for short notice.</p>
+    <p class="quote-step__hint">Same-day bookings are welcome at no extra cost — a small fee applies only for next-day notice.</p>
 
     <div class="quote-field">
       <label for="moveDateTrigger">Move date</label>
@@ -236,15 +236,32 @@
       <div class="quote-item-list" id="itemsBedroom"></div>
     </div>
     <div class="quote-field">
-      <label>Kitchen &amp; appliances</label>
+      <label>Kitchen</label>
       <div class="quote-item-list" id="itemsKitchen"></div>
+    </div>
+    <div class="quote-field">
+      <label>Living area</label>
+      <div class="quote-item-list" id="itemsLiving"></div>
+    </div>
+    <div class="quote-field">
+      <label>Office / Study</label>
+      <div class="quote-item-list" id="itemsOffice"></div>
+    </div>
+    <div class="quote-field">
+      <label>Outdoor</label>
+      <div class="quote-item-list" id="itemsOutdoor"></div>
     </div>
     <div class="quote-field">
       <label>Other</label>
       <div class="quote-item-list" id="itemsOther"></div>
     </div>
 
-    <p class="quote-volume-note" id="volumeNote"></p>
+    <div class="quote-load-summary" id="loadSummary">
+      <div class="quote-load-summary__row"><span>Ideal truck</span><span id="idealTruckValue">Add items to get a recommendation</span></div>
+      <div class="quote-load-summary__row"><span>Recommended truck</span><span id="recommendedTruckValue">Add items to get a recommendation</span></div>
+      <div class="quote-load-summary__row"><span>Suggested helpers</span><span id="suggestedHelpersValue">0</span></div>
+      <div class="quote-load-summary__row"><span>Estimated load</span><span id="estimatedVolumeValue">0.0 units</span></div>
+    </div>
 
     <button type="button" class="quote-btn quote-btn--filled" id="applyRecommendationBtn" disabled>Apply recommendation</button>
   </div>

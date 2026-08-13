@@ -50,8 +50,14 @@
     applyRecommendationBtn: $('#applyRecommendationBtn'),
     itemsBedroom: $('#itemsBedroom'),
     itemsKitchen: $('#itemsKitchen'),
+    itemsLiving: $('#itemsLiving'),
+    itemsOffice: $('#itemsOffice'),
+    itemsOutdoor: $('#itemsOutdoor'),
     itemsOther: $('#itemsOther'),
-    volumeNote: $('#volumeNote'),
+    idealTruckValue: $('#idealTruckValue'),
+    recommendedTruckValue: $('#recommendedTruckValue'),
+    suggestedHelpersValue: $('#suggestedHelpersValue'),
+    estimatedVolumeValue: $('#estimatedVolumeValue'),
     helpersMinus: $('#helpersMinus'),
     helpersPlus: $('#helpersPlus'),
     helpersValue: $('#helpersValue'),
@@ -96,7 +102,14 @@
 
   const MAX_ADDITIONAL_HELPERS = 10;
   const MAX_TRIPS = 5;
-  const GROUP_CONTAINERS = { bedroom: els.itemsBedroom, kitchen: els.itemsKitchen, other: els.itemsOther };
+  const GROUP_CONTAINERS = {
+    bedroom: els.itemsBedroom,
+    kitchen: els.itemsKitchen,
+    living: els.itemsLiving,
+    office: els.itemsOffice,
+    outdoor: els.itemsOutdoor,
+    other: els.itemsOther,
+  };
   const VEHICLE_BLURBS = {
     '1_3_ton': "Best for a single room or a light student move.",
     '1_3_ton_trailer': 'Extra capacity for a full room plus furniture.',
@@ -104,6 +117,14 @@
     '8_ton': 'Large household or multi-bedroom relocations.',
   };
   let lastRecommendedVehicle = null;
+  let lastSuggestedHelpers = 0;
+
+  // Placeholder heuristic, not a pricing rule: every ~15 volume units beyond the
+  // first suggests one more pair of hands, on top of whatever crew the vehicle
+  // already includes. The customer can still adjust the stepper afterwards.
+  function suggestedAdditionalHelpers(volume) {
+    return Math.max(0, Math.min(MAX_ADDITIONAL_HELPERS, Math.ceil(volume / 15) - 1));
+  }
 
   const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -214,6 +235,9 @@
   els.applyRecommendationBtn.addEventListener('click', () => {
     if (lastRecommendedVehicle) {
       selectVehicle(lastRecommendedVehicle);
+      state.additionalHelpers = lastSuggestedHelpers;
+      updateHelpersButtons();
+      refreshLiveTotal();
     }
     closeLoadAssistant();
   });
@@ -261,23 +285,35 @@
   function updateVolumeNote() {
     const catalog = state.pricingConfig?.itemCatalog;
     const vehicles = state.pricingConfig?.vehicles;
-    if (!catalog || !vehicles) { els.volumeNote.textContent = ''; return; }
-    const count = totalItemCount();
-    if (count === 0) {
-      els.volumeNote.textContent = '';
+    if (!catalog || !vehicles) return;
+
+    const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
+    els.estimatedVolumeValue.textContent = `${volume.toFixed(1)} units`;
+
+    if (totalItemCount() === 0) {
+      els.idealTruckValue.textContent = 'Add items to get a recommendation';
+      els.recommendedTruckValue.textContent = 'Add items to get a recommendation';
+      els.suggestedHelpersValue.textContent = '0';
       lastRecommendedVehicle = null;
+      lastSuggestedHelpers = 0;
       els.applyRecommendationBtn.disabled = true;
       return;
     }
-    const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
+
     const match = Object.entries(vehicles).find(([, v]) => volume <= v.volumeThreshold);
     if (match) {
       lastRecommendedVehicle = match[0];
-      els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — looks like ${match[1].label} will do it.`;
+      lastSuggestedHelpers = suggestedAdditionalHelpers(volume);
+      els.idealTruckValue.textContent = match[1].label;
+      els.recommendedTruckValue.textContent = match[1].label;
+      els.suggestedHelpersValue.textContent = String(lastSuggestedHelpers);
       els.applyRecommendationBtn.disabled = false;
     } else {
       lastRecommendedVehicle = null;
-      els.volumeNote.textContent = `${count} item${count > 1 ? 's' : ''} added — that's more than our largest truck handles; we'll need to quote this one personally.`;
+      lastSuggestedHelpers = 0;
+      els.idealTruckValue.textContent = "That's bigger than our largest truck — we'll quote this one personally.";
+      els.recommendedTruckValue.textContent = 'Manual quote required';
+      els.suggestedHelpersValue.textContent = '—';
       els.applyRecommendationBtn.disabled = true;
     }
   }
@@ -513,7 +549,10 @@
 
   async function fetchQuotePreview() {
     if (!canQuote()) {
-      showReceiptPlaceholder('Add your pickup, drop-off and truck above to see your price.');
+      const message = state.inZone === false
+        ? "That's outside our current Hatfield service area — contact us directly."
+        : 'Add your pickup, drop-off and truck above to see your price.';
+      showReceiptPlaceholder(message);
       return;
     }
     try {

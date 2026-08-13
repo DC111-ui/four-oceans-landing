@@ -177,12 +177,27 @@
   text-align: center;
 }
 
-.quote-volume-note {
+.quote-load-summary {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 12px 0 16px;
+}
+.quote-load-summary__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
   font-size: .85rem;
+}
+.quote-load-summary__row span:first-child {
   font-weight: 600;
-  color: var(--teal-deep);
-  margin: 10px 0 0;
-  min-height: 1.2em;
+  color: var(--ink-soft);
+}
+.quote-load-summary__row span:last-child {
+  font-weight: 700;
+  color: var(--navy-deep);
+  text-align: right;
 }
 
 .quote-access-preview {
@@ -213,6 +228,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
+}
+.quote-modal[hidden] {
+  display: none;
 }
 .quote-modal__backdrop {
   position: absolute;
@@ -400,7 +418,7 @@
   border: 2px solid var(--line);
   background: #fff;
   border-radius: var(--radius);
-  padding: 14px 56px 14px 16px;
+  padding: 14px 16px;
   text-align: left;
   font-family: var(--font-body);
   font-size: .92rem;
@@ -432,9 +450,6 @@
 }
 .quote-radio-card[aria-pressed="true"] strong { color: var(--teal-deep); }
 .quote-radio-card__price {
-  position: absolute;
-  top: 10px;
-  right: 12px;
   font-size: .72rem;
   font-weight: 700;
   color: var(--gold-deep);
@@ -642,6 +657,9 @@
   align-items: center;
   font-family: var(--font-display);
   z-index: 15;
+}
+.quote-sticky-total[hidden] {
+  display: none;
 }
 .quote-sticky-total__label { font-size: .8rem; opacity: .7; }
 .quote-sticky-total__value { font-weight: 800; font-size: 1.1rem; color: var(--gold-bright); }
