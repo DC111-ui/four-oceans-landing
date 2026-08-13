@@ -124,6 +124,16 @@
     '4_ton': 'For a 1–2 bedroom apartment or a heavier load.',
     '8_ton': 'Large household or multi-bedroom relocations.',
   };
+  // Real Four Oceans Group fleet photography (client-approved, from the
+  // poster campaign) -- the bakkie covers both 1.3t tiers, the box truck
+  // covers both larger tiers, since that's the actual fleet: one bakkie
+  // class, one box-truck class, not four distinct real vehicles.
+  const VEHICLE_IMAGES = {
+    '1_3_ton': 'assets/vehicles/bakkie.jpg',
+    '1_3_ton_trailer': 'assets/vehicles/bakkie.jpg',
+    '4_ton': 'assets/vehicles/box-truck.jpg',
+    '8_ton': 'assets/vehicles/box-truck.jpg',
+  };
   let lastRecommendedVehicle = null;
   let lastSuggestedHelpers = 0;
 
@@ -209,10 +219,12 @@
     Object.entries(vehicles).forEach(([key, def]) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'quote-radio-card';
+      btn.className = 'quote-radio-card quote-radio-card--vehicle';
       btn.dataset.value = key;
       btn.setAttribute('aria-pressed', state.vehicleType === key ? 'true' : 'false');
+      const image = VEHICLE_IMAGES[key];
       btn.innerHTML = `
+        ${image ? `<img class="quote-radio-card__image" src="${image}" alt="" loading="lazy">` : ''}
         <strong>${def.label}</strong>
         <span>${VEHICLE_BLURBS[key] || ''}</span>
         <span class="quote-radio-card__price">from R${def.baseFare}</span>

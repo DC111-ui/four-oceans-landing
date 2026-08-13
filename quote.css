@@ -91,7 +91,7 @@
   left: 20px;
   right: 20px;
   z-index: 16;
-  background: #b3261e;
+  background: var(--error);
   color: #fff;
   font-size: .85rem;
   font-weight: 600;
@@ -118,6 +118,7 @@
 .quote-step__hint {
   color: var(--ink-soft);
   font-size: .92rem;
+  line-height: 1.5;
   margin: 0 0 20px;
 }
 
@@ -134,7 +135,7 @@
 .quote-field__note {
   font-weight: 500;
   color: var(--ink-soft);
-  font-size: .78rem;
+  font-size: .8125rem;
 }
 .quote-field--row {
   display: flex;
@@ -209,6 +210,7 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1rem;
+  font-variant-numeric: tabular-nums;
   min-width: 1.5ch;
   text-align: center;
 }
@@ -218,6 +220,7 @@
   border-radius: var(--radius);
   padding: 14px 16px;
   margin: 12px 0 16px;
+  font-variant-numeric: tabular-nums;
 }
 .quote-load-summary__row {
   display: flex;
@@ -232,12 +235,12 @@
 }
 .quote-load-summary__row span:last-child {
   font-weight: 700;
-  color: var(--navy-deep);
+  color: var(--teal-deep);
   text-align: right;
 }
 
 .quote-access-preview {
-  font-size: .82rem;
+  font-size: .8125rem;
   font-weight: 600;
   color: var(--teal-deep);
   margin: 10px 0 0;
@@ -367,7 +370,7 @@
   text-overflow: ellipsis;
 }
 .quote-modal__recommendation span:last-child {
-  font-size: .78rem;
+  font-size: .8125rem;
   color: var(--ink-soft);
 }
 .quote-modal__footer .quote-btn {
@@ -473,6 +476,7 @@
 .quote-manual-quote p {
   color: var(--ink);
   font-weight: 600;
+  line-height: 1.5;
   margin: 0 0 16px;
 }
 .quote-manual-quote .quote-btn { flex: none; padding: 12px 24px; }
@@ -488,7 +492,7 @@
 .quote-subsection__title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: .95rem;
+  font-size: 1rem;
   color: var(--navy-deep);
   margin: 0 0 12px;
 }
@@ -515,7 +519,7 @@
   min-height: 1.2em;
 }
 .quote-zone-status[data-state="ok"] { color: var(--teal-deep); }
-.quote-zone-status[data-state="error"] { color: #b3261e; }
+.quote-zone-status[data-state="error"] { color: var(--error); }
 
 /* ---- Radio cards (size/tier/vehicle/time slot) ---- */
 .quote-radio-cards {
@@ -556,7 +560,7 @@
 }
 .quote-radio-card span {
   font-weight: 400;
-  font-size: .78rem;
+  font-size: .8125rem;
   color: var(--ink-soft);
 }
 .quote-radio-card[aria-pressed="true"] {
@@ -569,6 +573,18 @@
   font-size: .72rem;
   font-weight: 700;
   color: var(--gold-deep);
+}
+
+.quote-radio-card--vehicle {
+  padding-top: 0;
+  overflow: hidden;
+}
+.quote-radio-card__image {
+  width: calc(100% + 32px);
+  margin: 0 -16px 8px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: calc(var(--radius) - 2px) calc(var(--radius) - 2px) 0 0;
 }
 
 /* ---- Checkboxes ---- */
@@ -603,7 +619,7 @@
   margin-left: auto;
   font-weight: 700;
   color: var(--gold-deep);
-  font-size: .82rem;
+  font-size: .8125rem;
 }
 
 /* ---- Stepper (crew size) ---- */
@@ -639,6 +655,7 @@
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
   min-width: 1.5ch;
   text-align: center;
 }
@@ -650,6 +667,7 @@
   border: 1px solid var(--line);
   padding: 20px;
   margin-bottom: 18px;
+  font-variant-numeric: tabular-nums;
 }
 .quote-receipt__loading { color: var(--ink-soft); font-size: .9rem; }
 .quote-receipt__row {
@@ -682,12 +700,12 @@
 .quote-receipt__balance {
   display: flex;
   justify-content: space-between;
-  font-size: .8rem;
+  font-size: .8125rem;
   color: var(--ink-soft);
 }
 
 .quote-disclosure {
-  font-size: .8rem;
+  font-size: .8125rem;
   color: var(--ink-soft);
   margin-bottom: 16px;
 }
@@ -807,7 +825,7 @@
 .quote-sticky-total[hidden] {
   display: none;
 }
-.quote-sticky-total__label { font-size: .8rem; opacity: .7; }
+.quote-sticky-total__label { font-size: .8125rem; opacity: .7; }
 .quote-sticky-total__value { font-weight: 800; font-size: 1.1rem; color: var(--gold-bright); }
 
 .quote-btn {
