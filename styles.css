@@ -6,6 +6,11 @@
   --gold: #CC9A3C;
   --gold-bright: #E3B24E;
   --gold-deep: #8A6620; /* accessible on-light text/icon variant of --gold */
+  /* Metallic gold for gold SURFACES only (buttons, bands, icon chips) — matches the
+     brushed-ring gradient in the logo mark. Text stays flat --gold/--gold-bright/
+     --gold-deep for legibility; gradient-fill text is a different, muddier effect. */
+  --gold-metal: linear-gradient(122deg, #7A5A1C 0%, #CC9A3C 22%, #F4E4B8 44%, #E3B24E 58%, #CC9A3C 78%, #7A5A1C 100%);
+  --gold-metal-wide: linear-gradient(100deg, #7A5A1C 0%, #CC9A3C 9%, #F4E4B8 18%, #CC9A3C 27%, #7A5A1C 36%, #CC9A3C 45%, #F4E4B8 54%, #CC9A3C 63%, #7A5A1C 72%, #CC9A3C 81%, #F4E4B8 90%, #CC9A3C 100%);
   --teal: #1C8C86;
   --teal-deep: #146661;
   --canvas: #FAF7F2;
@@ -105,8 +110,8 @@ input, select, textarea { font: inherit; }
 .btn svg { width: 18px; height: 18px; }
 .btn--lg { padding: 15px 28px; font-size: 0.98rem; }
 .btn--full { width: 100%; }
-.btn--gold { background: var(--gold); color: var(--navy-deep); }
-.btn--gold:hover { background: var(--gold-bright); transform: translateY(-2px); }
+.btn--gold { background: var(--gold-metal); color: var(--navy-deep); }
+.btn--gold:hover { filter: brightness(1.1) saturate(1.05); transform: translateY(-2px); }
 .btn--outline { border-color: rgba(255,255,255,.4); color: var(--navy-deep); background: rgba(255,255,255,.6); }
 .btn--outline:hover { border-color: var(--teal); background: #fff; transform: translateY(-2px); }
 .btn--ghost { border-color: rgba(244,239,228,.5); color: var(--cream); }
@@ -281,7 +286,7 @@ input, select, textarea { font: inherit; }
 }
 
 /* ============ Trust strip ============ */
-.trust-strip { background: var(--gold); }
+.trust-strip { background: var(--gold-metal-wide); }
 .trust-strip__inner {
   display: flex;
   flex-wrap: wrap;
@@ -375,7 +380,7 @@ input, select, textarea { font: inherit; }
 .service-card__icon svg { width: 24px; height: 24px; }
 
 .services__grid--procurement .service-card__icon { background: var(--teal-deep); }
-.services__grid--logistics .service-card__icon { background: var(--gold); }
+.services__grid--logistics .service-card__icon { background: var(--gold-metal); }
 
 /* ============ Who we serve ============ */
 .serve { position: relative; overflow: hidden; padding: 96px 0; background: var(--navy-deep); }
@@ -421,7 +426,7 @@ input, select, textarea { font: inherit; }
 
 .serve-card--teal .serve-card__icon { background: var(--teal-deep); }
 .serve-card--teal h3 { color: var(--teal-deep); }
-.serve-card--gold .serve-card__icon { background: var(--gold); }
+.serve-card--gold .serve-card__icon { background: var(--gold-metal); }
 .serve-card--gold h3 { color: var(--gold-deep); }
 
 /* ============ Poster campaign marquee ============ */
@@ -519,7 +524,7 @@ input, select, textarea { font: inherit; }
 .value p { color: var(--ink-soft); font-size: .9rem; line-height: 1.55; margin: 0; }
 
 /* ============ CTA band ============ */
-.cta-band { background: var(--gold); padding: 56px 0; }
+.cta-band { background: var(--gold-metal-wide); padding: 56px 0; }
 .cta-band__inner {
   display: flex;
   align-items: center;
