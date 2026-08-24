@@ -14,17 +14,47 @@ document.querySelectorAll('.nav a').forEach(link => {
   });
 });
 
-// Quote form: no backend wired up yet, so just acknowledge the request.
+// Contact form: posts to the same WordPress backend that runs the quote
+// wizard, which emails the business via Brevo (see includes/notify.php's
+// foq_notify_business_new_contact on the server).
+const FOQ_API_BASE = 'https://fouroceansgroup.co.za/wp/wp-json/four-oceans/v1';
 const form = document.getElementById('quoteForm');
 const status = document.getElementById('formStatus');
+const submitBtn = form.querySelector('button[type="submit"]');
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('name').value.trim();
-  status.textContent = name
-    ? `Thanks, ${name.split(' ')[0]}. We'll be in touch shortly.`
-    : `Thanks. We'll be in touch shortly.`;
-  form.reset();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const service = document.getElementById('service').value;
+  const message = document.getElementById('message').value.trim();
+
+  const originalLabel = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending…';
+  status.textContent = '';
+
+  try {
+    const res = await fetch(`${FOQ_API_BASE}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, phone, service, message }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || "Couldn't send your request — please WhatsApp or call us instead.");
+    }
+    status.textContent = name
+      ? `Thanks, ${name.split(' ')[0]}. We'll be in touch shortly.`
+      : `Thanks. We'll be in touch shortly.`;
+    form.reset();
+  } catch (err) {
+    status.textContent = err.message || "Couldn't send your request — please WhatsApp or call us instead.";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalLabel;
+  }
 });
 
 // Scroll-reveal for sections
