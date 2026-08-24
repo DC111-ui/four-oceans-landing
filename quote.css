@@ -32,12 +32,22 @@
 }
 .quote-header__back:active { background: rgba(255,255,255,.18); }
 .quote-header__back svg { width: 20px; height: 20px; }
+.quote-header__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex: 1;
+  min-width: 0;
+}
+.quote-header__logo { height: 26px; width: auto; flex-shrink: 0; }
 .quote-header__title {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.05rem;
-  flex: 1;
-  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .quote-header__spacer { width: 38px; }
 
