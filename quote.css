@@ -507,20 +507,36 @@
   margin: 0 0 12px;
 }
 
+/* Same bordered-card language as .quote-checkbox below, just compact
+   enough to sit inline next to the floor <select> in .quote-field--row. */
 .quote-toggle-field {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 14px;
+  height: 100%;
+  padding: 0 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+@media (hover: hover) {
+  .quote-toggle-field:hover { border-color: var(--teal); }
+}
+.quote-toggle-field:has(input:checked) {
+  border-color: var(--teal);
+  background: rgba(28,140,134,.06);
 }
 .quote-toggle-field label {
-  padding: 11px 0;
+  padding: 13px 0;
   font-weight: 700;
   font-size: .85rem;
   color: var(--navy-deep);
   cursor: pointer;
+  flex: 1;
 }
-.quote-toggle-field input { width: 22px; height: 22px; accent-color: var(--teal); }
+.quote-toggle-field input { width: 20px; height: 20px; accent-color: var(--teal); flex-shrink: 0; }
 
 .quote-zone-status {
   font-size: .88rem;
