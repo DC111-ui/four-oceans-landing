@@ -69,40 +69,43 @@ mobileNavPanel.querySelectorAll('a').forEach((link) => {
 // foq_notify_business_new_contact on the server).
 const FOQ_API_BASE = 'https://fouroceansgroup.co.za/wp/wp-json/four-oceans/v1';
 const contactForm = document.getElementById('contactForm');
-const contactStatus = document.getElementById('contactFormStatus');
-const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
 
-contactForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const name = document.getElementById('cf-name').value.trim();
-  const email = document.getElementById('cf-email').value.trim();
-  const phone = document.getElementById('cf-phone').value.trim();
-  const service = document.getElementById('cf-service').value;
-  const message = document.getElementById('cf-message').value.trim();
+if (contactForm) {
+  const contactStatus = document.getElementById('contactFormStatus');
+  const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
 
-  const originalLabel = contactSubmitBtn.textContent;
-  contactSubmitBtn.disabled = true;
-  contactSubmitBtn.textContent = 'Sending…';
-  contactStatus.textContent = '';
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('cf-name').value.trim();
+    const email = document.getElementById('cf-email').value.trim();
+    const phone = document.getElementById('cf-phone').value.trim();
+    const service = document.getElementById('cf-service').value;
+    const message = document.getElementById('cf-message').value.trim();
 
-  try {
-    const res = await fetch(`${FOQ_API_BASE}/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, service, message }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.message || "Couldn't send your request — please WhatsApp or call us instead.");
+    const originalLabel = contactSubmitBtn.textContent;
+    contactSubmitBtn.disabled = true;
+    contactSubmitBtn.textContent = 'Sending…';
+    contactStatus.textContent = '';
+
+    try {
+      const res = await fetch(`${FOQ_API_BASE}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, service, message }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || "Couldn't send your request — please WhatsApp or call us instead.");
+      }
+      contactStatus.textContent = name
+        ? `Thanks, ${name.split(' ')[0]}. We'll be in touch shortly.`
+        : `Thanks. We'll be in touch shortly.`;
+      contactForm.reset();
+    } catch (err) {
+      contactStatus.textContent = err.message || "Couldn't send your request — please WhatsApp or call us instead.";
+    } finally {
+      contactSubmitBtn.disabled = false;
+      contactSubmitBtn.textContent = originalLabel;
     }
-    contactStatus.textContent = name
-      ? `Thanks, ${name.split(' ')[0]}. We'll be in touch shortly.`
-      : `Thanks. We'll be in touch shortly.`;
-    contactForm.reset();
-  } catch (err) {
-    contactStatus.textContent = err.message || "Couldn't send your request — please WhatsApp or call us instead.";
-  } finally {
-    contactSubmitBtn.disabled = false;
-    contactSubmitBtn.textContent = originalLabel;
-  }
-});
+  });
+}

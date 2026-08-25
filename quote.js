@@ -224,7 +224,7 @@
       btn.setAttribute('aria-pressed', state.vehicleType === key ? 'true' : 'false');
       const image = VEHICLE_IMAGES[key];
       btn.innerHTML = `
-        ${image ? `<img class="quote-radio-card__image" src="${image}" alt="" loading="lazy">` : ''}
+        ${image ? `<img class="quote-radio-card__image" src="${image}" alt="${def.label}" loading="lazy">` : ''}
         <strong>${def.label}</strong>
         <span>${VEHICLE_BLURBS[key] || ''}</span>
         <span class="quote-radio-card__price">from R${def.baseFare}</span>
