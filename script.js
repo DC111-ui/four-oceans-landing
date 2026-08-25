@@ -1,39 +1,89 @@
 // Mobile nav toggle
-const topbar = document.getElementById('topbar');
 const navToggle = document.getElementById('navToggle');
+const navToggleIcon = document.getElementById('navToggleIcon');
+const mobileNavPanel = document.getElementById('mobileNavPanel');
+const HAMBURGER_PATH = 'M4 7H20M4 12H20M4 17H20';
+const CLOSE_PATH = 'M6 6L18 18M6 18L18 6';
+
+function setMobileNavOpen(open) {
+  mobileNavPanel.hidden = !open;
+  navToggle.setAttribute('aria-expanded', String(open));
+  navToggleIcon.setAttribute('d', open ? CLOSE_PATH : HAMBURGER_PATH);
+}
 
 navToggle.addEventListener('click', () => {
-  const isOpen = topbar.classList.toggle('nav-open');
-  navToggle.setAttribute('aria-expanded', String(isOpen));
+  setMobileNavOpen(mobileNavPanel.hidden);
 });
 
-document.querySelectorAll('.nav a').forEach(link => {
-  link.addEventListener('click', () => {
-    topbar.classList.remove('nav-open');
-    navToggle.setAttribute('aria-expanded', 'false');
-  });
+mobileNavPanel.querySelectorAll('a').forEach((link) => {
+  link.addEventListener('click', () => setMobileNavOpen(false));
 });
+
+// Campaign poster carousel: auto-scrolls, pauses on hover/touch/drag and
+// while scrolled off-screen, with prev/next buttons for manual control.
+(() => {
+  const track = document.getElementById('posterTrack');
+  const prevBtn = document.getElementById('posterPrev');
+  const nextBtn = document.getElementById('posterNext');
+  if (!track) return;
+
+  let paused = false;
+  let resumeAt = 0;
+  let offscreen = false;
+  let raf = null;
+
+  function step() {
+    raf = requestAnimationFrame(step);
+    if (paused || offscreen || Date.now() < resumeAt) return;
+    const half = track.scrollWidth / 2;
+    if (half < 10) return;
+    track.scrollLeft = track.scrollLeft >= half ? track.scrollLeft - half : track.scrollLeft + 0.6;
+  }
+  raf = requestAnimationFrame(step);
+
+  function nudge(dir) {
+    resumeAt = Date.now() + 3000;
+    track.scrollBy({ left: dir * 318, behavior: 'smooth' });
+  }
+
+  track.addEventListener('mouseenter', () => { paused = true; });
+  track.addEventListener('mouseleave', () => { paused = false; resumeAt = Date.now() + 1200; });
+  track.addEventListener('pointerdown', () => { paused = true; });
+  track.addEventListener('pointerup', () => { paused = false; resumeAt = Date.now() + 1200; });
+  track.addEventListener('wheel', () => { resumeAt = Date.now() + 3000; }, { passive: true });
+  track.addEventListener('touchmove', () => { resumeAt = Date.now() + 3000; }, { passive: true });
+  prevBtn.addEventListener('click', () => nudge(-1));
+  nextBtn.addEventListener('click', () => nudge(1));
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => { offscreen = !entries[0].isIntersecting; },
+      { rootMargin: '200px 0px' }
+    );
+    io.observe(track);
+  }
+})();
 
 // Contact form: posts to the same WordPress backend that runs the quote
 // wizard, which emails the business via Brevo (see includes/notify.php's
 // foq_notify_business_new_contact on the server).
 const FOQ_API_BASE = 'https://fouroceansgroup.co.za/wp/wp-json/four-oceans/v1';
-const form = document.getElementById('quoteForm');
-const status = document.getElementById('formStatus');
-const submitBtn = form.querySelector('button[type="submit"]');
+const contactForm = document.getElementById('contactForm');
+const contactStatus = document.getElementById('contactFormStatus');
+const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
 
-form.addEventListener('submit', async (e) => {
+contactForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const service = document.getElementById('service').value;
-  const message = document.getElementById('message').value.trim();
+  const name = document.getElementById('cf-name').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  const service = document.getElementById('cf-service').value;
+  const message = document.getElementById('cf-message').value.trim();
 
-  const originalLabel = submitBtn.textContent;
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending…';
-  status.textContent = '';
+  const originalLabel = contactSubmitBtn.textContent;
+  contactSubmitBtn.disabled = true;
+  contactSubmitBtn.textContent = 'Sending…';
+  contactStatus.textContent = '';
 
   try {
     const res = await fetch(`${FOQ_API_BASE}/contact`, {
@@ -45,150 +95,14 @@ form.addEventListener('submit', async (e) => {
     if (!res.ok) {
       throw new Error(data.message || "Couldn't send your request — please WhatsApp or call us instead.");
     }
-    status.textContent = name
+    contactStatus.textContent = name
       ? `Thanks, ${name.split(' ')[0]}. We'll be in touch shortly.`
       : `Thanks. We'll be in touch shortly.`;
-    form.reset();
+    contactForm.reset();
   } catch (err) {
-    status.textContent = err.message || "Couldn't send your request — please WhatsApp or call us instead.";
+    contactStatus.textContent = err.message || "Couldn't send your request — please WhatsApp or call us instead.";
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = originalLabel;
+    contactSubmitBtn.disabled = false;
+    contactSubmitBtn.textContent = originalLabel;
   }
 });
-
-// Scroll-reveal for sections
-const revealTargets = document.querySelectorAll('.service-card, .serve-card, .value');
-if ('IntersectionObserver' in window) {
-  revealTargets.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(16px)'; });
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.transition = 'opacity .5s ease, transform .5s ease';
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  revealTargets.forEach(el => io.observe(el));
-}
-
-// "Four Oceans" generative wave backdrop behind the Who We Serve section.
-// Pure Canvas 2D, no dependencies. Pauses off-screen, on a hidden tab, and
-// under prefers-reduced-motion (draws one static frame instead).
-(() => {
-  const canvas = document.getElementById('serveCanvas');
-  if (!canvas || !canvas.getContext) return;
-  const section = canvas.closest('.serve');
-  if (!section) return;
-  const ctx = canvas.getContext('2d');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const WAVES = [
-    { color: 'rgba(28,140,134,0.35)', amplitude: 26, wavelength: 420, speed: 0.9,  baseline: 0.30 },
-    { color: 'rgba(204,154,60,0.20)', amplitude: 34, wavelength: 620, speed: -0.6, baseline: 0.50 },
-    { color: 'rgba(20,102,97,0.30)',  amplitude: 20, wavelength: 340, speed: 1.3,  baseline: 0.68 },
-    { color: 'rgba(227,178,78,0.15)', amplitude: 40, wavelength: 760, speed: -0.5, baseline: 0.86 },
-  ];
-  const particles = Array.from({ length: 26 }, () => ({
-    x: Math.random(),
-    y: Math.random(),
-    r: 1 + Math.random() * 1.8,
-    drift: 6 + Math.random() * 14,
-    twinkleOffset: Math.random() * Math.PI * 2,
-  }));
-
-  let width = 0, height = 0, dpr = 1;
-  let pointerX = 0.5;
-  let running = false;
-  let inView = false;
-  let rafId = null;
-  let startTime = null;
-
-  function resize() {
-    const rect = section.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    width = rect.width;
-    height = rect.height;
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function drawWave(w, t) {
-    const parallax = (pointerX - 0.5) * 18;
-    ctx.beginPath();
-    ctx.moveTo(0, height);
-    for (let x = 0; x <= width; x += 14) {
-      const y = w.baseline * height
-        + Math.sin((x / w.wavelength) + t * w.speed) * w.amplitude
-        + parallax * Math.sin(x / 900 + w.baseline * 4);
-      ctx.lineTo(x, y);
-    }
-    ctx.lineTo(width, height);
-    ctx.closePath();
-    ctx.fillStyle = w.color;
-    ctx.fill();
-  }
-
-  function drawParticles(t) {
-    particles.forEach(p => {
-      const px = p.x * width;
-      const raw = (p.y * height) - t * p.drift;
-      const py = ((raw % height) + height) % height;
-      const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(t * 1.6 + p.twinkleOffset));
-      ctx.beginPath();
-      ctx.arc(px, py, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(244,239,228,${(0.35 * twinkle).toFixed(3)})`;
-      ctx.fill();
-    });
-  }
-
-  function render(t) {
-    ctx.clearRect(0, 0, width, height);
-    WAVES.forEach(w => drawWave(w, t));
-    drawParticles(t);
-  }
-
-  function frame(now) {
-    if (!running) return;
-    if (startTime === null) startTime = now;
-    render((now - startTime) / 1000);
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function start() {
-    if (running || reduceMotion) return;
-    running = true;
-    startTime = null;
-    rafId = requestAnimationFrame(frame);
-  }
-  function stop() {
-    running = false;
-    if (rafId) cancelAnimationFrame(rafId);
-  }
-
-  resize();
-  render(0);
-
-  window.addEventListener('resize', () => { resize(); if (!running) render(0); });
-  section.addEventListener('mousemove', (e) => {
-    const rect = section.getBoundingClientRect();
-    pointerX = (e.clientX - rect.left) / rect.width;
-  });
-  section.addEventListener('mouseleave', () => { pointerX = 0.5; });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stop(); else if (inView) start();
-  });
-
-  if ('IntersectionObserver' in window && !reduceMotion) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        inView = entry.isIntersecting;
-        if (inView && !document.hidden) start(); else stop();
-      });
-    }, { threshold: 0.05 });
-    io.observe(section);
-  }
-})();

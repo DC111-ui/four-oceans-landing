@@ -8,284 +8,384 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #F7F5F0; color: #0B1D26; -webkit-font-smoothing: antialiased; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow-x: hidden; }
+  a { color: #10303D; text-decoration: none; }
+  a:hover { color: #0B1D26; }
+  * { box-sizing: border-box; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #C8E64B; outline-offset: 2px; }
+
+  .link-lime:hover { color: #C8E64B; }
+  .link-lime-bright:hover { color: #D8F168; }
+  .btn-lime:hover { background: #D8F168; }
+  .btn-navy:hover { background: #10303D; }
+  .btn-outline:hover { border-color: #C8E64B; color: #C8E64B; }
+  .btn-outline-navy:hover { border-color: #0B1D26; }
+  .tile-lift:hover { transform: translateY(-4px); }
+  .quote-link:hover { gap: 16px; }
+
+  .menu-btn { display: none; }
+  .menu-btn svg { pointer-events: none; }
+
+  #mobileNavPanel[hidden] { display: none; }
+  @keyframes mobileNavIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .mobile-nav-panel { animation: mobileNavIn 220ms cubic-bezier(0, 0, 0.2, 1) both; }
+
+  .wa-fab { transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease; }
+  .wa-fab:hover { background: #D8F168; transform: translateY(-2px); }
+  .poster-track:active { cursor: grabbing; }
+  @media (max-width: 520px) {
+    .wa-fab { width: 52px !important; height: 52px !important; right: 16px !important; bottom: 16px !important; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes waFabIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+    .wa-fab { animation: waFabIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 1s; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes heroRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes heroLine { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes heroWipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+    .hero-eyebrow { animation: heroRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.05s; }
+    .hero-line { animation: heroLine 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .hero-line--1 { animation-delay: 0.15s; }
+    .hero-line--2 { animation-delay: 0.32s; }
+    .hero-ctas { animation: heroRise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.5s; }
+    .hero-photo { animation: heroWipe 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.3s; will-change: clip-path; }
+  }
+
+  @media (max-width: 860px) {
+    .grid-4, .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+
+  @media (max-width: 780px) {
+    .site-nav, .header-phone { display: none !important; }
+    .menu-btn { display: flex !important; }
+    .header-inner { padding: 12px 20px !important; gap: 14px !important; }
+    .hero-inner { padding: 28px 20px 40px !important; }
+    .hero-h1 { font-size: 42px !important; letter-spacing: -0.02em !important; }
+    .hero-sub { font-size: 16px !important; }
+    .two-col-head { grid-template-columns: 1fr !important; gap: 18px !important; }
+    .section-inner { padding-left: 20px !important; padding-right: 20px !important; }
+    .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+    .form-grid { grid-template-columns: 1fr !important; }
+    .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .cta-banner { flex-direction: column !important; align-items: flex-start !important; }
+    .h2-lg { font-size: 34px !important; }
+    .h2-xl { font-size: 40px !important; }
+  }
+
+  @media (max-width: 520px) {
+    .grid-4, .grid-3 { grid-template-columns: 1fr !important; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ============ NAV ============ -->
-<header class="topbar" id="topbar">
-  <div class="wrap topbar__inner">
-    <a href="#top" class="brand" aria-label="Four Oceans Group home">
-      <img class="brand__mark" src="assets/logo-mark.png" alt="" width="210" height="199">
-      <span class="brand__word">
-        <span class="brand__name">FOUR OCEANS<em>GROUP</em></span>
-        <span class="brand__tag">Connecting Africa · Delivering Possibilities</span>
-      </span>
+<header style="position: sticky; top: 0; z-index: 40; background: rgba(11,29,38,0.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1);">
+  <div class="header-inner" style="max-width: 1240px; margin: 0 auto; padding: 14px 32px; display: flex; align-items: center; gap: 32px;">
+    <a href="#top" style="display: flex; align-items: center; gap: 12px; color: #F7F5F0;">
+      <img src="assets/logo-mark.png" alt="Four Oceans Group" style="height: 36px; width: auto; display: block;" />
+      <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.1;">Four Oceans<span style="display: block; font-weight: 500; color: #C8E64B; letter-spacing: 0.22em; font-size: 11px;">Group</span></span>
     </a>
-
-    <nav class="nav" id="siteNav" aria-label="Primary">
-      <a href="#services">Services</a>
-      <a href="#who-we-serve">Who We Serve</a>
-      <a href="#campaign">Campaign</a>
-      <a href="#contact">Contact</a>
+    <nav class="site-nav" style="display: flex; gap: 28px; margin-left: auto; font-size: 14px; font-weight: 500;">
+      <a href="#services" class="link-lime" style="color: rgba(247,245,240,0.75);">Services</a>
+      <a href="#who-we-serve" class="link-lime" style="color: rgba(247,245,240,0.75);">Who We Serve</a>
+      <a href="#campaign" class="link-lime" style="color: rgba(247,245,240,0.75);">Campaign</a>
+      <a href="#contact" class="link-lime" style="color: rgba(247,245,240,0.75);">Contact</a>
     </nav>
-
-    <div class="topbar__actions">
-      <a class="phone-chip" href="tel:+27617037902">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.2c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="currentColor"/></svg>
-        <span>+27 61 703 7902</span>
-      </a>
-      <a class="btn btn--gold" href="#contact">Get a Quote</a>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <a href="tel:+27617037902" class="header-phone link-lime" style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: rgba(247,245,240,0.75);">+27 61 703 7902</a>
+      <a href="#contact" class="btn-lime" style="background: #C8E64B; color: #0B1D26; font-weight: 600; font-size: 14px; padding: 10px 20px; border-radius: 2px; white-space: nowrap;">Get a Quote</a>
+      <button type="button" id="navToggle" class="menu-btn btn-outline" aria-label="Toggle menu" aria-expanded="false" style="align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid rgba(247,245,240,0.3); background: transparent; color: #F7F5F0; border-radius: 2px; cursor: pointer; padding: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path id="navToggleIcon" d="M4 7H20M4 12H20M4 17H20"></path></svg>
+      </button>
     </div>
-
-    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="siteNav" aria-label="Toggle menu">
-      <span></span><span></span><span></span>
-    </button>
+  </div>
+  <div id="mobileNavPanel" class="mobile-nav-panel" hidden style="border-top: 1px solid rgba(255,255,255,0.1); background: #0B1D26;">
+    <nav style="display: flex; flex-direction: column; padding: 8px 20px 20px;">
+      <a href="#services" class="link-lime" style="color: rgba(247,245,240,0.85); padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px;">Services</a>
+      <a href="#who-we-serve" class="link-lime" style="color: rgba(247,245,240,0.85); padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px;">Who We Serve</a>
+      <a href="#campaign" class="link-lime" style="color: rgba(247,245,240,0.85); padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px;">Campaign</a>
+      <a href="#contact" class="link-lime" style="color: rgba(247,245,240,0.85); padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 15px;">Contact</a>
+      <a href="tel:+27617037902" style="color: #C8E64B; padding: 14px 0; font-family: 'IBM Plex Mono', monospace; font-size: 14px;">+27 61 703 7902</a>
+    </nav>
   </div>
 </header>
 
-<main id="top">
-
-  <!-- ============ HERO ============ -->
-  <section class="hero">
-    <div class="hero__bg">
-      <img class="hero__photo" src="assets/hero-truck-raw.png" alt="A Four Oceans Group mover with a clipboard greeting a client on her driveway, while staff load boxes into the liveried box truck and bakkie behind them" width="1024" height="1024">
-      <div class="hero__scrim"></div>
-    </div>
-
-    <div class="wrap hero__inner">
-      <div class="hero__copy">
-        <p class="eyebrow">Procurement · Logistics · Storage · Relocations</p>
-        <h1 class="hero__headline"><span class="hero__headline-line">Connecting Africa</span><span class="hero__headline-accent">Delivering Possibilities</span></h1>
-        <div class="hero__ctas">
-          <a class="btn btn--gold btn--lg" href="#contact">Get a Quote</a>
-          <a class="btn btn--outline btn--lg" href="https://wa.me/27617037902" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.2.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.8-2c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s1 2.6 1.1 2.8c.1.2 2 3 4.7 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z" fill="currentColor"/></svg>
-            <span>WhatsApp Us</span>
-          </a>
-        </div>
+<section id="top" style="position: relative; background: #0B1D26; min-height: 660px; display: flex; align-items: flex-start; overflow: hidden;">
+  <img class="hero-photo" src="assets/hero-truck-raw.png" alt="A Four Oceans Group mover with a clipboard greeting a client on her driveway, while staff load boxes into the liveried box truck and bakkie behind them" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55;" />
+  <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,29,38,0.94) 0%, rgba(11,29,38,0.72) 46%, rgba(11,29,38,0.25) 100%);"></div>
+  <div class="hero-inner" style="position: relative; max-width: 1240px; margin: 0 auto; padding: 56px 32px 72px; width: 100%;">
+    <div style="max-width: 720px; display: flex; flex-direction: column; gap: 28px;">
+      <div class="hero-eyebrow" style="display: flex; align-items: center; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #C8E64B;">
+        <span style="width: 28px; height: 1px; background: #C8E64B; display: block;"></span>
+        Procurement · Logistics · Storage · Relocations
+      </div>
+      <h1 class="hero-h1" style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 74px; line-height: 0.96; letter-spacing: -0.03em; color: #F7F5F0; margin: 0; text-wrap: balance;"><span class="hero-line hero-line--1" style="display: block;">Connecting Africa</span><span class="hero-line hero-line--2" style="display: block; color: #C8E64B;">Delivering Possibilities</span></h1>
+      <p class="hero-sub" style="font-size: 19px; line-height: 1.55; color: rgba(247,245,240,0.78); margin: 0; max-width: 560px; text-wrap: pretty;">One partner for sourcing goods in South Africa and getting them, or you, across the border to Zimbabwe. Building materials, groceries, parts, appliances, freight, storage and moves.</p>
+      <div class="hero-ctas" style="display: flex; gap: 14px; flex-wrap: wrap; padding-top: 6px;">
+        <a href="#contact" class="btn-lime" style="background: #C8E64B; color: #0B1D26; font-weight: 600; font-size: 16px; padding: 16px 32px; border-radius: 2px;">Get a Quote</a>
+        <a href="https://wa.me/27617037902" target="_blank" rel="noopener" class="btn-outline" style="border: 1px solid rgba(247,245,240,0.35); color: #F7F5F0; font-weight: 600; font-size: 16px; padding: 16px 32px; border-radius: 2px;">WhatsApp Us</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ============ POSTER CAMPAIGN ============ -->
-  <section class="poster-campaign" id="campaign">
-    <div class="wrap">
-      <p class="eyebrow eyebrow--dark">Campaign</p>
-      <h2 class="section-title">One brand.<span class="poster-campaign__accent">Every service.</span></h2>
-      <p class="section-lead">A look at the Four Oceans Group marketing campaign. Each poster is built around a real problem we solve.</p>
-    </div>
-
-    <div class="poster-marquee" role="region" aria-label="Four Oceans Group poster campaign">
-      <div class="poster-marquee__track" id="posterTrack">
-        <div class="poster-marquee__item"><img src="assets/posters/Your-Cross-Border-Partner-Poster.jpg" alt="Four Oceans Group poster: Your Cross-Border Partner" loading="lazy"><span>Your Cross-Border Partner</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Stocking-In-South-Africa-Poster.jpg" alt="Four Oceans Group poster: Stocking in South Africa" loading="lazy"><span>Stocking in South Africa</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Full-Service-Move-Poster.jpg" alt="Four Oceans Group poster: Full-Service Move" loading="lazy"><span>Full-Service Move</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Apartment-Moves-Made-Easy-Poster.jpg" alt="Four Oceans Group poster: Apartment Moves, Made Easy" loading="lazy"><span>Apartment Moves, Made Easy</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Everything-SA-Poster.jpg" alt="Four Oceans Group poster: Everything SA" loading="lazy"><span>Everything SA</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Bulk-Orders-For-Business-Poster.jpg" alt="Four Oceans Group poster: Bulk Orders for Business" loading="lazy"><span>Bulk Orders for Business</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Genuine-Parts-Poster.jpg" alt="Four Oceans Group poster: Genuine Parts" loading="lazy"><span>Genuine Parts</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Service-Kits-Poster.jpg" alt="Four Oceans Group poster: Service Kits" loading="lazy"><span>Service Kits</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Premium-Appliances-Poster.jpg" alt="Four Oceans Group poster: Premium Appliances" loading="lazy"><span>Premium Appliances</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Everyday-Appliances-Poster.jpg" alt="Four Oceans Group poster: Everyday Appliances" loading="lazy"><span>Everyday Appliances</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Flooring-Sorted-Poster.jpg" alt="Four Oceans Group poster: Flooring Sorted" loading="lazy"><span>Flooring Sorted</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Finish-It-Properly-Poster.jpg" alt="Four Oceans Group poster: Finish It Properly" loading="lazy"><span>Finish It Properly</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Bathrooms-Built-Right-Poster.jpg" alt="Four Oceans Group poster: Bathrooms, Built Right" loading="lazy"><span>Bathrooms, Built Right</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Life-In-Transit-Poster.jpg" alt="Four Oceans Group poster: Life in Transit" loading="lazy"><span>Life in Transit</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Holiday-Storage-Poster.jpg" alt="Four Oceans Group poster: Holiday Storage" loading="lazy"><span>Holiday Storage</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Bakkie-Only-Poster.jpg" alt="Four Oceans Group poster: Bakkie-Only Service" loading="lazy"><span>Bakkie-Only Service</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Last-Minute-Move-Poster.jpg" alt="Four Oceans Group poster: Last-Minute Move" loading="lazy"><span>Last-Minute Move</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Move-Out-Assistance-Poster.jpg" alt="Four Oceans Group poster: Move-Out Assistance" loading="lazy"><span>Move-Out Assistance</span></div>
-        <div class="poster-marquee__item"><img src="assets/posters/Hatfield-Move-Out-Poster.jpg" alt="Four Oceans Group poster: Hatfield Move-Out" loading="lazy"><span>Hatfield Move-Out</span></div>
-        <!-- duplicate set for seamless loop -->
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Your-Cross-Border-Partner-Poster.jpg" alt="" loading="lazy"><span>Your Cross-Border Partner</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Stocking-In-South-Africa-Poster.jpg" alt="" loading="lazy"><span>Stocking in South Africa</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Full-Service-Move-Poster.jpg" alt="" loading="lazy"><span>Full-Service Move</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Apartment-Moves-Made-Easy-Poster.jpg" alt="" loading="lazy"><span>Apartment Moves, Made Easy</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Everything-SA-Poster.jpg" alt="" loading="lazy"><span>Everything SA</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Bulk-Orders-For-Business-Poster.jpg" alt="" loading="lazy"><span>Bulk Orders for Business</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Genuine-Parts-Poster.jpg" alt="" loading="lazy"><span>Genuine Parts</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Service-Kits-Poster.jpg" alt="" loading="lazy"><span>Service Kits</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Premium-Appliances-Poster.jpg" alt="" loading="lazy"><span>Premium Appliances</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Everyday-Appliances-Poster.jpg" alt="" loading="lazy"><span>Everyday Appliances</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Flooring-Sorted-Poster.jpg" alt="" loading="lazy"><span>Flooring Sorted</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Finish-It-Properly-Poster.jpg" alt="" loading="lazy"><span>Finish It Properly</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Bathrooms-Built-Right-Poster.jpg" alt="" loading="lazy"><span>Bathrooms, Built Right</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Life-In-Transit-Poster.jpg" alt="" loading="lazy"><span>Life in Transit</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Holiday-Storage-Poster.jpg" alt="" loading="lazy"><span>Holiday Storage</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Bakkie-Only-Poster.jpg" alt="" loading="lazy"><span>Bakkie-Only Service</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Last-Minute-Move-Poster.jpg" alt="" loading="lazy"><span>Last-Minute Move</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Move-Out-Assistance-Poster.jpg" alt="" loading="lazy"><span>Move-Out Assistance</span></div>
-        <div class="poster-marquee__item" aria-hidden="true"><img src="assets/posters/Hatfield-Move-Out-Poster.jpg" alt="" loading="lazy"><span>Hatfield Move-Out</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ TRUST STRIP ============ -->
-  <section class="trust-strip">
-    <div class="wrap trust-strip__inner">
-      <div class="trust-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 6v6c0 5 3.8 9 9 10 5.2-1 9-5 9-10V6l-9-4z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Genuine Products, No Imitations</span></div>
-      <div class="trust-item"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.8 2.5 4.2 5.7 4.2 9S14.8 18.5 12 21c-2.8-2.5-4.2-5.7-4.2-9S9.2 5.5 12 3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Connecting South Africa &amp; Zimbabwe</span></div>
-      <div class="trust-item"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>On Time, Every Time</span></div>
-      <div class="trust-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2.5" y="14" width="4" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="17.5" y="14" width="4" height="6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Professional Support</span></div>
-    </div>
-  </section>
-
-  <!-- ============ SERVICES ============ -->
-  <section class="services" id="services">
-    <div class="wrap">
-      <h2 class="section-title">What We Do</h2>
-
-      <h3 class="services__group-title services__group-title--procurement">Procurement</h3>
-      <div class="services__grid services__grid--quad services__grid--procurement">
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5" fill="none" stroke="#F4EFE4" stroke-width="1.7"/><path d="M3 10h18M3 16h18M9 4v16M15 4v16" stroke="#F4EFE4" stroke-width="1.3"/></svg></div>
-          <h3>Building Materials</h3>
-          <p>Flooring, bathroom fittings, electrical, paint and waterproofing, sourced in South Africa and delivered to Zimbabwe. One supplier, one shipment, lower logistics cost.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1.6 10.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8Z M8 8 10 3h4l2 5" fill="none" stroke="#F4EFE4" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 12v4M15 12v4" stroke="#F4EFE4" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-          <h3>Groceries</h3>
-          <p>Authentic South African products, bulk orders and door-to-door delivery. Everything SA has to offer, delivered to Zimbabwe.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 4.9L3 17.5V21h3.5l6.3-6.3a4 4 0 0 0 4.9-5.4l-2.8 2.8-2.1-2.1 2.8-2.8Z" fill="none" stroke="#F4EFE4" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
-          <h3>Automotive Parts</h3>
-          <p>Genuine vehicle spares and service kits, sourced in South Africa and delivered to Zimbabwe. Guaranteed fit, manufacturer warranty, longer lifespan.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="1.5" fill="none" stroke="#F4EFE4" stroke-width="1.7"/><path d="M6 9.5h12" stroke="#F4EFE4" stroke-width="1.5"/><path d="M9 5.5v2M9 12.5v2" stroke="#F4EFE4" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <h3>Appliances</h3>
-          <p>Premium and local brands, sourced in South Africa and delivered to Zimbabwe, from everyday essentials to luxury appliances.</p>
-        </article>
-      </div>
-      <p class="services__partners">Sourced from South Africa's trusted retailers and brands, including CTM, Italtile, Builders Warehouse, Makro, Woolworths, Dis-Chem, LG, Samsung, Bosch and more, then delivered door to door in Zimbabwe.</p>
-
-      <h3 class="services__group-title services__group-title--logistics">Logistics, Storage &amp; Moving</h3>
-      <div class="services__grid services__grid--quad services__grid--logistics">
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><path d="M3 12h18M3 12l4-6h10l4 6M3 12v6a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-6" fill="none" stroke="#0B2340" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Cross-Border Logistics</h3>
-          <p>Freight, customs documentation and border compliance from Pretoria to Beitbridge. Fleet from bakkies to 30-ton trucks.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="10" rx="1.5" fill="none" stroke="#0B2340" stroke-width="1.7"/><path d="M4 13h16M12 9v10" stroke="#0B2340" stroke-width="1.4"/></svg></div>
-          <h3>Furniture Relocations</h3>
-          <p>Household and apartment moves, packed and handled by an experienced team.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12M4 21h16M9 21v-6h6v6" fill="none" stroke="#0B2340" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
-          <h3>Student Storage</h3>
-          <p>Affordable, secure storage for University of Pretoria (UP) students in Hatfield, over holidays, internships and lease transitions.</p>
-        </article>
-        <article class="service-card">
-          <div class="service-card__icon"><svg viewBox="0 0 24 24"><path d="M12 4 2 9l10 5 10-5-10-5Z" fill="none" stroke="#0B2340" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 12v5c0 1.4 3 2.5 6 2.5s6-1.1 6-2.5v-5" fill="none" stroke="#0B2340" stroke-width="1.6"/></svg></div>
-          <h3>Student Relocations</h3>
-          <p>Hatfield move-outs for UP students, done right and on short notice. Available year-round.</p>
-          <a class="service-card__quote-link" href="quote.html">Get an instant quote &rarr;</a>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ WHO WE SERVE ============ -->
-  <section class="serve" id="who-we-serve">
-    <canvas class="serve__canvas" id="serveCanvas" aria-hidden="true"></canvas>
-    <div class="wrap">
-      <p class="eyebrow eyebrow--dark">Who We Serve</p>
-      <h2 class="section-title">Built for the way you move</h2>
-
-      <div class="serve__grid">
-        <div class="serve-card serve-card--teal">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3.2" fill="none" stroke="#F4EFE4" stroke-width="1.6"/><circle cx="17" cy="8" r="2.6" fill="none" stroke="#F4EFE4" stroke-width="1.6"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14.5 20c0-2.6-1.2-4.8-3-6.1 1-1 2.4-1.6 4-1.6 3 0 5.5 2.5 5.5 5.5" fill="none" stroke="#F4EFE4" stroke-width="1.5"/></svg></div>
-          <h3>Families &amp; Individuals</h3>
-          <p>Bulk grocery runs, moving and storage, handled with care.</p>
-        </div>
-        <div class="serve-card serve-card--gold">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5-10-5Zm-7 8v5c0 1.1 3.1 3 7 3s7-1.9 7-3v-5" fill="none" stroke="#0B2340" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
-          <h3>UP Students (Hatfield)</h3>
-          <p>Storage between semesters and full-service Hatfield move-outs for University of Pretoria students.</p>
-        </div>
-        <div class="serve-card serve-card--teal">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10.5a1 1 0 0 1-1 .8H6.5a1 1 0 0 1-1-.8L4 9Zm3 0V6a5 5 0 0 1 10 0v3" fill="none" stroke="#F4EFE4" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
-          <h3>Businesses &amp; Retailers</h3>
-          <p>Bulk procurement, stocking goods in South Africa, and cross-border freight.</p>
-        </div>
-        <div class="serve-card serve-card--teal">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5-7-11a7 7 0 0 1 14 0c0 6-7 11-7 11Z" fill="none" stroke="#F4EFE4" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 11h6M12 8v6" stroke="#F4EFE4" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <h3>NGOs, Churches &amp; Caterers</h3>
-          <p>Bulk orders for community programmes, congregations and events.</p>
-        </div>
-        <div class="serve-card serve-card--gold">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#0B2340" stroke-width="1.7"/><path d="M3 12h18M12 3c2.8 2.5 4.2 5.7 4.2 9S14.8 18.5 12 21c-2.8-2.5-4.2-5.7-4.2-9S9.2 5.5 12 3z" fill="none" stroke="#0B2340" stroke-width="1.4"/></svg></div>
-          <h3>Importers &amp; Exporters</h3>
-          <p>Cross-border logistics, customs support and documentation.</p>
-        </div>
-        <div class="serve-card serve-card--gold">
-          <div class="serve-card__icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="1.5" fill="none" stroke="#0B2340" stroke-width="1.7"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="#0B2340" stroke-width="1.7" stroke-linecap="round"/></svg></div>
-          <h3>Event Companies</h3>
-          <p>Temporary storage and transport for events.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ VALUES BAND ============ -->
-  <section class="values">
-    <div class="wrap values__inner">
-      <p class="values__lead">Professionalism. Integrity. Humanity.</p>
-      <div class="values__grid">
-        <div class="value"><span>Integrity</span><p>Honesty, transparency and respect in everything we do.</p></div>
-        <div class="value"><span>Reliability</span><p>Clients count on us to deliver what we promise, every time.</p></div>
-        <div class="value"><span>Safety</span><p>The safety of our people, cargo and communities, first.</p></div>
-        <div class="value"><span>Customer Commitment</span><p>We listen, adapt and go the extra mile for every client.</p></div>
-        <div class="value"><span>Innovation</span><p>Smarter sourcing and routing to keep costs down and delivery fast.</p></div>
-        <div class="value"><span>Operational Excellence</span><p>Refining routes, packing and paperwork so every job runs tighter than the last.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ CTA BAND ============ -->
-  <section class="cta-band">
-    <div class="wrap cta-band__inner">
+<section id="services" style="background: #F7F5F0; padding: 104px 0;">
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 56px;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
       <div>
-        <h2>One partner. Endless possibilities.</h2>
-        <p>Across borders. Across industries. Across Africa.</p>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A8A8F; margin-bottom: 16px;">What We Do</div>
+        <h2 class="h2-lg" style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 52px; line-height: 1.0; letter-spacing: -0.025em; margin: 0; color: #0B1D26;">Two halves of one job</h2>
       </div>
-      <div class="cta-band__actions">
-        <a class="btn btn--gold btn--lg" href="#contact">Get a Quote</a>
-        <a class="btn btn--ghost btn--lg" href="tel:+27617037902">Call +27 61 703 7902</a>
+      <p style="font-size: 17px; line-height: 1.6; color: #4C5C62; margin: 0; max-width: 640px; text-wrap: pretty;">We buy it for you in South Africa, then we move it. Either half works on its own; together they mean one supplier, one shipment and one invoice.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 2px solid #0B1D26; padding-bottom: 12px;">
+        <h3 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; margin: 0;">Procurement</h3>
+      </div>
+      <div class="grid-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Building Materials</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Flooring, bathroom fittings, electrical, paint and waterproofing, sourced in South Africa and delivered to Zimbabwe. One supplier, one shipment, lower logistics cost.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Groceries</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Authentic South African products, bulk orders and door-to-door delivery. Everything SA has to offer, delivered to Zimbabwe.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Automotive Parts</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Genuine vehicle spares and service kits, sourced in South Africa and delivered to Zimbabwe. Guaranteed fit, manufacturer warranty, longer lifespan.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Appliances</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Premium and local brands, sourced in South Africa and delivered to Zimbabwe, from everyday essentials to luxury appliances.</p>
+        </article>
+      </div>
+      <p style="font-size: 14.5px; line-height: 1.6; color: #4C5C62; margin: 0; max-width: 860px; border-left: 2px solid #C8E64B; padding-left: 18px;">Sourced from South Africa's trusted retailers and brands, including CTM, Italtile, Builders Warehouse, Makro, Woolworths, Dis-Chem, LG, Samsung, Bosch and more, then delivered door to door in Zimbabwe.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      <div style="display: flex; align-items: baseline; gap: 16px; border-bottom: 2px solid #0B1D26; padding-bottom: 12px;">
+        <h3 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; margin: 0;">Logistics, Storage &amp; Moving</h3>
+      </div>
+      <div class="grid-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Cross-Border Logistics</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Freight, customs documentation and border compliance from Pretoria to Beitbridge. Fleet from bakkies to 30-ton trucks.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Furniture Relocations</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Household and apartment moves, packed and handled by an experienced team.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Student Storage</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Affordable, secure storage for University of Pretoria (UP) students in Hatfield, over holidays, internships and lease transitions.</p>
+        </article>
+        <article class="btn-outline-navy" style="background: #FFFFFF; border: 1px solid #E4E0D6; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="width: 26px; height: 3px; background: #C8E64B;"></div>
+          <h4 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 19px; margin: 0; color: #0B1D26;">Student Relocations</h4>
+          <p style="font-size: 14.5px; line-height: 1.55; color: #4C5C62; margin: 0; text-wrap: pretty;">Hatfield move-outs for UP students, done right and on short notice. Available year-round.</p>
+        </article>
+      </div>
+      <div>
+        <a href="quote.html" class="quote-link" style="display: inline-flex; align-items: center; gap: 10px; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 17px; color: #0B1D26; border-bottom: 2px solid #C8E64B; padding-bottom: 4px;">Get an instant quote →</a>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ============ CONTACT ============ -->
-  <section class="contact" id="contact">
-    <div class="wrap contact__inner">
-      <div class="contact__form-wrap">
-        <p class="eyebrow eyebrow--dark">Get In Touch</p>
-        <h2 class="section-title">Tell us what you need moved</h2>
-        <p class="section-lead">Share a few details and our team will come back with a plan and a quote.</p>
+<section id="who-we-serve" style="background: #0B1D26; padding: 104px 0; color: #F7F5F0; border-top: 6px solid #C8E64B;">
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 48px;">
+    <div class="two-col-head" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: end;">
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #C8E64B; margin-bottom: 16px;">Who We Serve</div>
+        <h2 class="h2-xl" style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 68px; line-height: 0.96; letter-spacing: -0.035em; margin: 0;">Built for the way you move</h2>
+      </div>
+    </div>
+    <div class="grid-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;">
+      <div class="tile-lift" style="background: #C8E64B; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: rgba(11,29,38,0.45);">01</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #0B1D26;">Families &amp; Individuals</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(11,29,38,0.68); margin: 0; text-wrap: pretty;">Bulk grocery runs, moving and storage, handled with care.</p>
+      </div>
+      <div class="tile-lift" style="background: #16414F; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: #C8E64B;">02</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">UP Students (Hatfield)</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Storage between semesters and full-service Hatfield move-outs for University of Pretoria students.</p>
+      </div>
+      <div class="tile-lift" style="background: #0F2B36; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: #C8E64B;">03</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Businesses &amp; Retailers</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Bulk procurement, stocking goods in South Africa, and cross-border freight.</p>
+      </div>
+      <div class="tile-lift" style="background: #1C4E5C; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: #C8E64B;">04</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">NGOs, Churches &amp; Caterers</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Bulk orders for community programmes, congregations and events.</p>
+      </div>
+      <div class="tile-lift" style="background: #0F2B36; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: #C8E64B;">05</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Importers &amp; Exporters</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Cross-border logistics, customs support and documentation.</p>
+      </div>
+      <div class="tile-lift" style="background: #C8E64B; padding: 38px 30px; display: flex; flex-direction: column; gap: 12px; transition: transform 160ms ease;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: rgba(11,29,38,0.45);">06</div>
+        <h4 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 23px; letter-spacing: -0.015em; margin: 0; color: #0B1D26;">Event Companies</h4>
+        <p style="font-size: 15.5px; line-height: 1.55; color: rgba(11,29,38,0.68); margin: 0; text-wrap: pretty;">Temporary storage and transport for events.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <form id="quoteForm" class="quote-form" novalidate>
-          <div class="form-row">
-            <label for="name">Full name</label>
-            <input type="text" id="name" name="name" required autocomplete="name">
-          </div>
-          <div class="form-row form-row--split">
-            <div>
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required autocomplete="email">
-            </div>
-            <div>
-              <label for="phone">Phone / WhatsApp</label>
-              <input type="tel" id="phone" name="phone" autocomplete="tel">
-            </div>
-          </div>
-          <div class="form-row">
-            <label for="service">Service needed</label>
-            <select id="service" name="service">
+<section id="campaign" style="background: #F7F5F0; padding: 104px 0; overflow: hidden;">
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px 44px; display: flex; flex-direction: column; gap: 20px;">
+    <div>
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A8A8F; margin-bottom: 16px;">Campaign</div>
+      <h2 class="h2-lg" style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 52px; line-height: 1.0; letter-spacing: -0.025em; margin: 0; color: #0B1D26;">One brand. Every service.</h2>
+    </div>
+    <p style="font-size: 17px; line-height: 1.6; color: #4C5C62; margin: 0; max-width: 640px; text-wrap: pretty;">A look at the Four Oceans Group marketing campaign. Each poster is built around a real problem we solve.</p>
+  </div>
+  <div id="posterTrack" role="region" aria-label="Four Oceans Group campaign posters" aria-roledescription="carousel" class="section-inner poster-track" style="display: flex; gap: 18px; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; padding: 4px 32px 24px; cursor: grab; scrollbar-width: none;">
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Your-Cross-Border-Partner-Poster.jpg" alt="Four Oceans Group poster: Your Cross-Border Partner" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Your Cross-Border Partner</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Stocking-In-South-Africa-Poster.jpg" alt="Four Oceans Group poster: Stocking in South Africa" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Stocking in South Africa</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Full-Service-Move-Poster.jpg" alt="Four Oceans Group poster: Full-Service Move" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Full-Service Move</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Apartment-Moves-Made-Easy-Poster.jpg" alt="Four Oceans Group poster: Apartment Moves, Made Easy" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Apartment Moves, Made Easy</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Everything-SA-Poster.jpg" alt="Four Oceans Group poster: Everything SA" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Everything SA</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bulk-Orders-For-Business-Poster.jpg" alt="Four Oceans Group poster: Bulk Orders for Business" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bulk Orders for Business</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Genuine-Parts-Poster.jpg" alt="Four Oceans Group poster: Genuine Parts" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Genuine Parts</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Service-Kits-Poster.jpg" alt="Four Oceans Group poster: Service Kits" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Service Kits</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Premium-Appliances-Poster.jpg" alt="Four Oceans Group poster: Premium Appliances" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Premium Appliances</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Everyday-Appliances-Poster.jpg" alt="Four Oceans Group poster: Everyday Appliances" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Everyday Appliances</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Flooring-Sorted-Poster.jpg" alt="Four Oceans Group poster: Flooring Sorted" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Flooring Sorted</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Finish-It-Properly-Poster.jpg" alt="Four Oceans Group poster: Finish It Properly" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Finish It Properly</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bathrooms-Built-Right-Poster.jpg" alt="Four Oceans Group poster: Bathrooms, Built Right" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bathrooms, Built Right</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Life-In-Transit-Poster.jpg" alt="Four Oceans Group poster: Life in Transit" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Life in Transit</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Holiday-Storage-Poster.jpg" alt="Four Oceans Group poster: Holiday Storage" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Holiday Storage</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bakkie-Only-Poster.jpg" alt="Four Oceans Group poster: Bakkie-Only Service" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bakkie-Only Service</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Last-Minute-Move-Poster.jpg" alt="Four Oceans Group poster: Last-Minute Move" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Last-Minute Move</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Move-Out-Assistance-Poster.jpg" alt="Four Oceans Group poster: Move-Out Assistance" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Move-Out Assistance</figcaption></figure>
+    <figure style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Hatfield-Move-Out-Poster.jpg" alt="Four Oceans Group poster: Hatfield Move-Out" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Hatfield Move-Out</figcaption></figure>
+    <!-- duplicate set for seamless loop -->
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Your-Cross-Border-Partner-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Your Cross-Border Partner</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Stocking-In-South-Africa-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Stocking in South Africa</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Full-Service-Move-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Full-Service Move</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Apartment-Moves-Made-Easy-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Apartment Moves, Made Easy</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Everything-SA-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Everything SA</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bulk-Orders-For-Business-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bulk Orders for Business</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Genuine-Parts-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Genuine Parts</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Service-Kits-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Service Kits</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Premium-Appliances-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Premium Appliances</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Everyday-Appliances-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Everyday Appliances</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Flooring-Sorted-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Flooring Sorted</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Finish-It-Properly-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Finish It Properly</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bathrooms-Built-Right-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bathrooms, Built Right</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Life-In-Transit-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Life in Transit</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Holiday-Storage-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Holiday Storage</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Bakkie-Only-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Bakkie-Only Service</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Last-Minute-Move-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Last-Minute Move</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Move-Out-Assistance-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Move-Out Assistance</figcaption></figure>
+    <figure aria-hidden="true" style="margin: 0; flex: 0 0 300px; display: flex; flex-direction: column; gap: 12px;"><img src="assets/posters/Hatfield-Move-Out-Poster.jpg" alt="" draggable="false" loading="lazy" style="width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: #E4E0D6; display: block; border: 1px solid #E4E0D6; user-select: none;" /><figcaption style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.04em; color: #4C5C62;">Hatfield Move-Out</figcaption></figure>
+  </div>
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 4px 32px 0; display: flex; align-items: center; justify-content: center; gap: 12px;">
+    <button type="button" id="posterPrev" class="btn-outline-navy" aria-label="Previous posters" style="width: 44px; height: 44px; border: 1px solid #D9D4C8; background: #FFFFFF; color: #0B1D26; cursor: pointer; border-radius: 2px; padding: 0; display: flex; align-items: center; justify-content: center;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+    </button>
+    <button type="button" id="posterNext" class="btn-outline-navy" aria-label="Next posters" style="width: 44px; height: 44px; border: 1px solid #D9D4C8; background: #FFFFFF; color: #0B1D26; cursor: pointer; border-radius: 2px; padding: 0; display: flex; align-items: center; justify-content: center;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+    </button>
+  </div>
+</section>
+
+<section style="background: #0B1D26; padding: 96px 0; color: #F7F5F0;">
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 48px;">
+    <div style="max-width: 760px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #C8E64B; margin-bottom: 18px;">How We Work</div>
+      <h2 class="h2-xl" style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 62px; line-height: 0.98; letter-spacing: -0.035em; margin: 0; text-wrap: balance;">Professionalism. <span style="color: #C8E64B;">Integrity.</span> Humanity.</h2>
+    </div>
+    <div class="grid-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;">
+      <div class="tile-lift" style="background: #0F2B36; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(200,230,75,0.75);">01</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Integrity</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Honesty, transparency and respect in everything we do.</p>
+      </div>
+      <div class="tile-lift" style="background: #16414F; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(200,230,75,0.75);">02</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Reliability</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Clients count on us to deliver what we promise, every time.</p>
+      </div>
+      <div class="tile-lift" style="background: #0F2B36; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(200,230,75,0.75);">03</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Safety</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">The safety of our people, cargo and communities, first.</p>
+      </div>
+      <div class="tile-lift" style="background: #C8E64B; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(11,29,38,0.28);">04</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #0B1D26;">Customer Commitment</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(11,29,38,0.7); margin: 0; text-wrap: pretty;">We listen, adapt and go the extra mile for every client.</p>
+      </div>
+      <div class="tile-lift" style="background: #0F2B36; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(200,230,75,0.75);">05</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Innovation</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Smarter sourcing and routing to keep costs down and delivery fast.</p>
+      </div>
+      <div class="tile-lift" style="background: #16414F; padding: 32px 28px; display: flex; flex-direction: column; gap: 10px; transition: transform 160ms ease;">
+        <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 34px; line-height: 1; letter-spacing: -0.03em; color: rgba(200,230,75,0.75);">06</div>
+        <h5 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.015em; margin: 0; color: #F7F5F0;">Operational Excellence</h5>
+        <p style="font-size: 15px; line-height: 1.55; color: rgba(247,245,240,0.72); margin: 0; text-wrap: pretty;">Refining routes, packing and paperwork so every job runs tighter than the last.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: #C8E64B; padding: 80px 0;">
+  <div class="cta-banner section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; gap: 48px; flex-wrap: wrap;">
+    <div>
+      <h2 style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.0; letter-spacing: -0.03em; margin: 0 0 12px; color: #0B1D26;">One partner. Endless possibilities.</h2>
+      <p style="font-size: 17px; color: rgba(11,29,38,0.72); margin: 0;">Across borders. Across industries. Across Africa.</p>
+    </div>
+    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+      <a href="#contact" class="btn-navy" style="background: #0B1D26; color: #F7F5F0; font-weight: 600; font-size: 16px; padding: 16px 30px; border-radius: 2px;">Get a Quote</a>
+      <a href="tel:+27617037902" class="btn-outline-navy" style="border: 1px solid rgba(11,29,38,0.4); color: #0B1D26; font-weight: 600; font-size: 16px; padding: 16px 30px; border-radius: 2px;">Call +27 61 703 7902</a>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="background: #F7F5F0; padding: 104px 0;">
+  <div class="contact-grid section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: 1.25fr 1fr; gap: 72px;">
+    <div style="display: flex; flex-direction: column; gap: 28px;">
+      <div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A8A8F; margin-bottom: 16px;">Get In Touch</div>
+        <h2 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 46px; line-height: 1.02; letter-spacing: -0.025em; margin: 0 0 14px; color: #0B1D26;">Tell us what you need moved</h2>
+        <p style="font-size: 17px; line-height: 1.6; color: #4C5C62; margin: 0;">Share a few details and our team will come back with a plan and a quote.</p>
+      </div>
+      <form id="contactForm" novalidate style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A8A8F;">Full name</span>
+            <input type="text" id="cf-name" name="name" required autocomplete="name" style="border: 1px solid #D9D4C8; background: #FFFFFF; padding: 13px 14px; font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; color: #0B1D26; border-radius: 2px;" />
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A8A8F;">Email</span>
+            <input type="email" id="cf-email" name="email" required autocomplete="email" style="border: 1px solid #D9D4C8; background: #FFFFFF; padding: 13px 14px; font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; color: #0B1D26; border-radius: 2px;" />
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A8A8F;">Phone / WhatsApp</span>
+            <input type="tel" id="cf-phone" name="phone" autocomplete="tel" style="border: 1px solid #D9D4C8; background: #FFFFFF; padding: 13px 14px; font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; color: #0B1D26; border-radius: 2px;" />
+          </label>
+          <label style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A8A8F;">Service needed</span>
+            <select id="cf-service" name="service" style="border: 1px solid #D9D4C8; background: #FFFFFF; padding: 13px 14px; font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; color: #0B1D26; border-radius: 2px;">
               <option>Building Materials Procurement</option>
               <option>Grocery Procurement</option>
               <option>Automotive Parts Procurement</option>
@@ -296,70 +396,79 @@
               <option>Student Relocations</option>
               <option>Not sure yet</option>
             </select>
-          </div>
-          <div class="form-row">
-            <label for="message">Tell us more</label>
-            <textarea id="message" name="message" rows="4"></textarea>
-          </div>
-          <button type="submit" class="btn btn--gold btn--lg btn--full">Send Request</button>
-          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-        </form>
-      </div>
-
-      <aside class="contact__direct">
-        <h3>Talk to us directly</h3>
-        <a class="direct-link" href="tel:+27617037902">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.2c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z" fill="currentColor"/></svg>
-          <span>+27 61 703 7902</span>
-        </a>
-        <a class="direct-link" href="mailto:info@fouroceansgroup.co.za">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v12H3z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3 7 9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <span>info@fouroceansgroup.co.za</span>
-        </a>
-        <a class="direct-link" href="https://wa.me/27617037902" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <span>WhatsApp Us</span>
-        </a>
-        <div class="direct-link direct-link--static">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12A7 7 0 0 0 5 10c0 5.8 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-          <span>Pretoria, South Africa</span>
+          </label>
         </div>
-      </aside>
+        <label style="display: flex; flex-direction: column; gap: 7px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A8A8F;">Tell us more</span>
+          <textarea id="cf-message" name="message" rows="4" style="border: 1px solid #D9D4C8; background: #FFFFFF; padding: 13px 14px; font-size: 15px; font-family: 'IBM Plex Sans', sans-serif; color: #0B1D26; border-radius: 2px; resize: vertical;"></textarea>
+        </label>
+        <div>
+          <button type="submit" class="btn-navy" style="background: #0B1D26; color: #F7F5F0; border: none; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 16px; padding: 16px 34px; border-radius: 2px; cursor: pointer;">Send Request</button>
+        </div>
+        <p id="contactFormStatus" role="status" aria-live="polite" style="margin: 0; font-size: 14.5px; color: #4C5C62;"></p>
+      </form>
     </div>
-  </section>
 
-</main>
-
-<!-- ============ FOOTER ============ -->
-<footer class="footer">
-  <div class="wrap footer__inner">
-    <div class="footer__brand">
-      <span class="footer__name">FOUR OCEANS<em>GROUP</em></span>
-      <p>Connecting Africa. Delivering Possibilities.</p>
-      <p class="footer__reg">Company Reg. 2026/602465/07</p>
-    </div>
-    <nav class="footer__nav" aria-label="Footer">
-      <a href="#services">Services</a>
-      <a href="#who-we-serve">Who We Serve</a>
-      <a href="#campaign">Campaign</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <div class="footer__contact">
-      <a href="tel:+27617037902">+27 61 703 7902</a>
-      <a href="mailto:info@fouroceansgroup.co.za">info@fouroceansgroup.co.za</a>
-      <span>Pretoria, South Africa</span>
-    </div>
+    <aside style="background: #10303D; color: #F7F5F0; padding: 40px 36px; display: flex; flex-direction: column; gap: 28px; align-self: start;">
+      <h3 style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 24px; margin: 0;">Talk to us directly</h3>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <a href="tel:+27617037902" class="link-lime" style="color: #F7F5F0; font-family: 'IBM Plex Mono', monospace; font-size: 17px;">+27 61 703 7902</a>
+        <a href="mailto:info@fouroceansgroup.co.za" class="link-lime" style="color: rgba(247,245,240,0.8); font-size: 15px;">info@fouroceansgroup.co.za</a>
+        <a href="https://wa.me/27617037902" target="_blank" rel="noopener" class="link-lime-bright" style="color: #C8E64B; font-weight: 600; font-size: 15px;">WhatsApp Us →</a>
+      </div>
+      <div style="border-top: 1px solid rgba(247,245,240,0.18); padding-top: 24px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(247,245,240,0.5);">Based in</div>
+        <div style="font-size: 16px; font-weight: 500;">Pretoria, South Africa</div>
+      </div>
+    </aside>
   </div>
-  <div class="wrap footer__bottom">
-    <span>&copy; 2026 Four Oceans Group.</span>
-    <a class="footer__credit" href="https://darlingtonchanakira.com" target="_blank" rel="noopener">Site by Darlington Chanakira</a>
+</section>
+
+<footer style="background: #0B1D26; color: rgba(247,245,240,0.7); padding: 64px 0 32px;">
+  <div class="section-inner" style="max-width: 1240px; margin: 0 auto; padding: 0 32px; display: flex; flex-direction: column; gap: 40px;">
+    <div class="footer-grid" style="display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px;">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="assets/logo-mark.png" alt="Four Oceans Group" style="height: 34px; width: auto; display: block;" />
+          <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #F7F5F0; line-height: 1.1;">Four Oceans<span style="display: block; font-weight: 500; color: #C8E64B; letter-spacing: 0.22em; font-size: 11px;">Group</span></span>
+        </div>
+        <p style="margin: 0; font-size: 15px; color: rgba(247,245,240,0.6);">Connecting Africa. Delivering Possibilities.</p>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+          <a href="https://wa.me/27617037902" target="_blank" rel="noopener" aria-label="WhatsApp" class="link-lime" style="color: rgba(247,245,240,0.6); display: flex;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          </a>
+          <a href="https://www.instagram.com/fouroceansgroup" target="_blank" rel="noopener" aria-label="Instagram" class="link-lime" style="color: rgba(247,245,240,0.6); display: flex;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://www.tiktok.com/@fouroceansgroup" target="_blank" rel="noopener" aria-label="TikTok" class="link-lime" style="color: rgba(247,245,240,0.6); display: flex;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4v11.5a3.5 3.5 0 1 1-3.5-3.5"></path><path d="M10 4c0 3.5 2.5 6 6 6"></path></svg>
+          </a>
+        </div>
+        <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: rgba(247,245,240,0.4);">Company Reg. 2026/602465/07</p>
+      </div>
+      <nav style="display: flex; flex-direction: column; gap: 10px; font-size: 15px;">
+        <a href="#services" class="link-lime" style="color: rgba(247,245,240,0.7);">Services</a>
+        <a href="#who-we-serve" class="link-lime" style="color: rgba(247,245,240,0.7);">Who We Serve</a>
+        <a href="#campaign" class="link-lime" style="color: rgba(247,245,240,0.7);">Campaign</a>
+        <a href="#contact" class="link-lime" style="color: rgba(247,245,240,0.7);">Contact</a>
+      </nav>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px;">
+        <a href="tel:+27617037902" class="link-lime" style="color: rgba(247,245,240,0.7);">+27 61 703 7902</a>
+        <a href="mailto:info@fouroceansgroup.co.za" class="link-lime" style="color: rgba(247,245,240,0.7);">info@fouroceansgroup.co.za</a>
+        <span style="color: rgba(247,245,240,0.5);">Pretoria, South Africa</span>
+      </div>
+    </div>
+    <div style="border-top: 1px solid rgba(247,245,240,0.14); padding-top: 24px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-size: 13px; color: rgba(247,245,240,0.45);">
+      <span>© 2026 Four Oceans Group.</span>
+      <a href="https://darlingtonchanakira.com" target="_blank" rel="noopener" class="link-lime" style="color: rgba(247,245,240,0.45);">Site by Darlington Chanakira</a>
+    </div>
   </div>
 </footer>
 
-<a class="whatsapp-fab" href="https://wa.me/27617037902" target="_blank" rel="noopener" aria-label="Chat with Four Oceans Group on WhatsApp">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.2.2-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5s-.6-1.5-.8-2c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2s1 2.6 1.1 2.8c.1.2 2 3 4.7 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z" fill="currentColor"/></svg>
+<a href="https://wa.me/27617037902" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" class="wa-fab" style="position: fixed; right: 20px; bottom: 20px; z-index: 45; width: 58px; height: 58px; border-radius: 50%; background: #C8E64B; color: #0B1D26; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px -6px rgba(11,29,38,0.45);">
+  <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
 </a>
 
-<script src="script.js?v=1"></script>
+<script src="script.js?v=2"></script>
 </body>
 </html>
