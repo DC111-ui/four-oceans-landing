@@ -130,6 +130,7 @@
   font-size: .92rem;
   line-height: 1.5;
   margin: 0 0 20px;
+  overflow-wrap: break-word;
 }
 
 .quote-field {
@@ -386,6 +387,23 @@
 .quote-modal__footer .quote-btn {
   flex: none;
   padding: 12px 22px;
+}
+/* Below ~480px the recommendation text and the button can't both fit on
+   one line without truncating mid-word — stack them instead of squeezing. */
+@media (max-width: 480px) {
+  .quote-modal__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .quote-modal__recommendation strong {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  .quote-modal__footer .quote-btn {
+    width: 100%;
+  }
 }
 
 /* ---- Custom date picker ---- */
