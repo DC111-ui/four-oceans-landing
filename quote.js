@@ -106,6 +106,14 @@
     emailInvoiceStatus: $('#emailInvoiceStatus'),
     confirmationWhatsapp: $('#confirmationWhatsapp'),
     formError: $('#formError'),
+    navToggle: $('#navToggle'),
+    navToggleIcon: $('#navToggleIcon'),
+    mobileNavPanel: $('#mobileNavPanel'),
+    progress: $('#quoteProgress'),
+    progressFill: $('#quoteProgressFill'),
+    progressLabel: $('#quoteProgressLabel'),
+    pickupLiftTooSmallWrap: $('#pickupLiftTooSmallWrap'),
+    dropoffLiftTooSmallWrap: $('#dropoffLiftTooSmallWrap'),
   };
 
   const MAX_ADDITIONAL_HELPERS = 10;
@@ -130,10 +138,18 @@
   // class, one box-truck class, not four distinct real vehicles.
   const VEHICLE_IMAGES = {
     '1_3_ton': 'assets/vehicles/bakkie.jpg',
-    '1_3_ton_trailer': 'assets/vehicles/bakkie.jpg',
+    '1_3_ton_trailer': 'assets/vehicles/bakkie-trailer.jpg',
     '4_ton': 'assets/vehicles/box-truck.jpg',
     '8_ton': 'assets/vehicles/box-truck.jpg',
   };
+  // Client-side display normalisation only (item 15) — keeps the tier names on a
+  // single "<size> Load" pattern in the UI. The backend label/payload is untouched.
+  function vehicleLabel(raw) {
+    if (!raw) return raw;
+    // "Standard Load + Trailer (…)" breaks the "<size> Load" adjective pattern
+    // the other tiers use ("Extended Load", "Large Load") — normalise it.
+    return raw.replace(/Standard Load\s*\+\s*Trailer/i, 'Trailer Load');
+  }
   let lastRecommendedVehicle = null;
   let lastSuggestedHelpers = 0;
 
@@ -152,6 +168,64 @@
   }
   function clearFormError() {
     els.formError.hidden = true;
+  }
+
+  /* ---- Inline per-field validation (item 5) ---- */
+  function fieldWrap(el) {
+    return el.closest('.quote-field') || el;
+  }
+  function setFieldError(el, message) {
+    const wrap = fieldWrap(el);
+    if (wrap.classList.contains('quote-field')) {
+      wrap.classList.add('quote-field--invalid');
+      let msg = wrap.querySelector('.quote-field__error');
+      if (!msg) {
+        msg = document.createElement('p');
+        msg.className = 'quote-field__error';
+        msg.setAttribute('role', 'alert');
+        wrap.appendChild(msg);
+      }
+      msg.textContent = message;
+    } else {
+      wrap.classList.add('quote-invalid-outline');
+      let msg = wrap.nextElementSibling;
+      if (!msg || !msg.classList.contains('quote-field__error')) {
+        msg = document.createElement('p');
+        msg.className = 'quote-field__error';
+        msg.setAttribute('role', 'alert');
+        msg.style.display = 'flex';
+        wrap.insertAdjacentElement('afterend', msg);
+      }
+      msg.textContent = message;
+      msg.style.display = 'flex';
+    }
+  }
+  function clearFieldError(el) {
+    const wrap = fieldWrap(el);
+    wrap.classList.remove('quote-field--invalid', 'quote-invalid-outline');
+    const inWrap = wrap.querySelector && wrap.querySelector('.quote-field__error');
+    if (inWrap) inWrap.remove();
+    const after = wrap.nextElementSibling;
+    if (after && after.classList && after.classList.contains('quote-field__error')) after.remove();
+  }
+  // { focus target, its .quote-field wrapper anchor, validity test, message }
+  function validationChecks() {
+    return [
+      { el: els.pickupInput, ok: () => state.inZone === true,
+        msg: 'Enter a pickup and drop-off address inside our Hatfield service area.' },
+      { el: els.vehicleCards, ok: () => !!state.vehicleType,
+        msg: 'Pick a truck, or use the load assistant.' },
+      { el: els.moveDateTrigger, ok: () => !!state.moveDate,
+        msg: 'Choose a move date.' },
+      { el: $('.quote-radio-cards[data-field="timeSlot"]'), ok: () => !!state.timeSlot,
+        msg: 'Choose a morning or afternoon slot.' },
+      { el: els.customerNameInput, ok: () => state.customerName && state.customerName.trim().length >= 2,
+        msg: 'Enter your full name.' },
+      { el: els.customerEmailInput, ok: () => state.customerEmail && /\S+@\S+\.\S+/.test(state.customerEmail),
+        msg: 'Enter a valid email address — your invoice goes here.' },
+      { el: els.phoneInput, ok: () => state.phone && state.phone.trim().length >= 7,
+        msg: 'Enter a valid phone number.' },
+    ];
   }
 
   function totalItemCount() {
@@ -223,9 +297,10 @@
       btn.dataset.value = key;
       btn.setAttribute('aria-pressed', state.vehicleType === key ? 'true' : 'false');
       const image = VEHICLE_IMAGES[key];
+      const label = vehicleLabel(def.label);
       btn.innerHTML = `
-        ${image ? `<img class="quote-radio-card__image" src="${image}" alt="${def.label}" loading="lazy">` : ''}
-        <strong>${def.label}</strong>
+        ${image ? `<img class="quote-radio-card__image" src="${image}" alt="${label}" loading="lazy">` : ''}
+        <strong>${label}</strong>
         <span>${VEHICLE_BLURBS[key] || ''}</span>
         <span class="quote-radio-card__price">from R${def.baseFare}</span>
       `;
@@ -239,18 +314,71 @@
     $$('#vehicleCards .quote-radio-card').forEach((c) => {
       c.setAttribute('aria-pressed', c.dataset.value === key ? 'true' : 'false');
     });
+    document.dispatchEvent(new Event('foq:field-change'));
     refreshLiveTotal();
   }
 
+  const loadAssistantPanel = $('#loadAssistantModal .quote-modal__panel');
+  let loadAssistantLastFocus = null;
+
+  function focusables(container) {
+    return Array.from(container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )).filter((el) => !el.disabled && el.offsetParent !== null);
+  }
+
   function openLoadAssistant() {
+    loadAssistantLastFocus = document.activeElement;
     els.loadAssistantModal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const f = focusables(loadAssistantPanel);
+    (f[0] || loadAssistantPanel).focus();
   }
   function closeLoadAssistant() {
     els.loadAssistantModal.hidden = true;
+    document.body.style.overflow = '';
+    if (loadAssistantLastFocus && loadAssistantLastFocus.focus) loadAssistantLastFocus.focus();
   }
   els.loadAssistantTrigger.addEventListener('click', openLoadAssistant);
   els.loadAssistantClose.addEventListener('click', closeLoadAssistant);
   els.loadAssistantBackdrop.addEventListener('click', closeLoadAssistant);
+
+  // Focus trap + Esc for the modal (item 11)
+  els.loadAssistantModal.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); closeLoadAssistant(); return; }
+    if (e.key !== 'Tab') return;
+    const f = focusables(loadAssistantPanel);
+    if (!f.length) return;
+    const firstEl = f[0], lastEl = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
+    else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
+  });
+
+  // Collapsible category accordions (item 6)
+  $$('#loadAssistantModal .quote-accordion__head').forEach((head) => {
+    head.addEventListener('click', () => {
+      const acc = head.closest('.quote-accordion');
+      const panel = acc.querySelector('.quote-accordion__panel');
+      const open = acc.hasAttribute('data-open');
+      if (open) { acc.removeAttribute('data-open'); panel.hidden = true; head.setAttribute('aria-expanded', 'false'); }
+      else { acc.setAttribute('data-open', ''); panel.hidden = false; head.setAttribute('aria-expanded', 'true'); }
+    });
+  });
+
+  function updateGroupCounts() {
+    const catalog = state.pricingConfig?.itemCatalog || {};
+    const totals = {};
+    Object.entries(state.items).forEach(([key, qty]) => {
+      const g = catalog[key]?.group || 'other';
+      totals[g] = (totals[g] || 0) + qty;
+    });
+    $$('#loadAssistantModal .quote-accordion__count').forEach((badge) => {
+      const g = badge.dataset.countFor;
+      const n = totals[g] || 0;
+      badge.textContent = n;
+      if (n > 0) badge.removeAttribute('data-empty'); else badge.setAttribute('data-empty', '');
+    });
+  }
 
   els.applyRecommendationBtn.addEventListener('click', () => {
     if (lastRecommendedVehicle) {
@@ -309,6 +437,7 @@
 
     const volume = Object.entries(state.items).reduce((sum, [key, qty]) => sum + qty * (catalog[key]?.volume || 0), 0);
     els.estimatedVolumeValue.textContent = `${volume.toFixed(1)} units`;
+    updateGroupCounts();
 
     if (totalItemCount() === 0) {
       els.idealTruckValue.textContent = 'Add items to get a recommendation';
@@ -327,10 +456,11 @@
       lastRecommendedVehicle = match[0];
       lastSuggestedHelpers = suggestedAdditionalHelpers(volume);
       const helpersLabel = `${lastSuggestedHelpers} helper${lastSuggestedHelpers === 1 ? '' : 's'}`;
-      els.idealTruckValue.textContent = match[1].label;
-      els.recommendedTruckDetailValue.textContent = match[1].label;
+      const matchLabel = vehicleLabel(match[1].label);
+      els.idealTruckValue.textContent = matchLabel;
+      els.recommendedTruckDetailValue.textContent = matchLabel;
       els.suggestedHelpersDetailValue.textContent = String(lastSuggestedHelpers);
-      els.recommendedTruckValue.textContent = match[1].label;
+      els.recommendedTruckValue.textContent = matchLabel;
       els.suggestedHelpersValue.textContent = helpersLabel;
       els.applyRecommendationBtn.disabled = false;
     } else {
@@ -385,12 +515,15 @@
     const cfg = state.pricingConfig;
     if (!cfg) return;
     const describe = (floorSelect, floor, elevator, tooSmall) => {
-      const effectiveElevator = elevator && !tooSmall;
+      const effectiveLift = elevator && !tooSmall;
       const floorText = floorSelect.options[floorSelect.selectedIndex]?.text || 'Ground';
-      const floorLabel = floor === 0 ? floorText : `${floorText} floor`;
-      const amount = effectiveElevator ? cfg.elevatorSurcharge : (floor > 0 ? cfg.floorRate : 0);
-      const accessLabel = effectiveElevator ? 'elevator' : 'no elevator';
-      return `${floorLabel}, ${accessLabel} → +R${amount}`;
+      if (floor === 0) return 'Ground floor — no lift needed · no access charge';
+      const amount = effectiveLift ? cfg.elevatorSurcharge : cfg.floorRate;
+      const accessLabel = tooSmall
+        ? 'lift too small, stair carry'
+        : (effectiveLift ? 'lift available' : 'no lift, stair carry');
+      const suffix = amount > 0 ? ` → +R${amount}` : ' · no access charge';
+      return `${floorText} floor · ${accessLabel}${suffix}`;
     };
     els.pickupAccessPreview.textContent = describe(els.pickupFloorSelect, state.pickupFloor, state.pickupElevator, state.pickupElevatorTooSmall);
     els.dropoffAccessPreview.textContent = describe(els.dropoffFloorSelect, state.dropoffFloor, state.dropoffElevator, state.dropoffElevatorTooSmall);
@@ -401,8 +534,19 @@
     updateAccessPreview();
     refreshLiveTotal();
   });
+  // "Lift is too small" only makes sense once a lift has been declared —
+  // reveal it with the toggle, and clear it when the lift is unchecked (item 2).
+  function syncLiftTooSmall(side) {
+    const on = els[`${side}LiftToggle`].checked;
+    els[`${side}LiftTooSmallWrap`].hidden = !on;
+    if (!on && els[`${side}LiftTooSmall`].checked) {
+      els[`${side}LiftTooSmall`].checked = false;
+      state[`${side}ElevatorTooSmall`] = false;
+    }
+  }
   els.pickupLiftToggle.addEventListener('change', () => {
     state.pickupElevator = els.pickupLiftToggle.checked;
+    syncLiftTooSmall('pickup');
     updateAccessPreview();
     refreshLiveTotal();
   });
@@ -418,6 +562,7 @@
   });
   els.dropoffLiftToggle.addEventListener('change', () => {
     state.dropoffElevator = els.dropoffLiftToggle.checked;
+    syncLiftTooSmall('dropoff');
     updateAccessPreview();
     refreshLiveTotal();
   });
@@ -449,6 +594,7 @@
         btn.setAttribute('aria-pressed', 'true');
         state[field] = btn.dataset.value;
         if (onChange) onChange(btn.dataset.value);
+        document.dispatchEvent(new Event('foq:field-change'));
         refreshLiveTotal();
       });
     });
@@ -464,6 +610,28 @@
     return d.toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  function pickDate(iso) {
+    state.moveDate = iso;
+    els.moveDateTrigger.textContent = formatDateLabel(iso);
+    els.moveDateCalendar.hidden = true;
+    els.moveDateTrigger.focus();
+    document.dispatchEvent(new Event('foq:field-change'));
+    refreshLiveTotal();
+  }
+
+  // Roving-tabindex arrow-key navigation across the day grid (item 10).
+  // Clamps within the visible month; month changes stay on the ‹ › buttons.
+  function focusCalendarDay(fromBtn, deltaDays) {
+    const days = Array.from(els.calGrid.querySelectorAll('.quote-calendar__day:not(.quote-calendar__day--blank)'));
+    const idx = days.indexOf(fromBtn);
+    if (idx === -1) return;
+    const next = Math.max(0, Math.min(days.length - 1, idx + deltaDays));
+    const target = days[next];
+    days.forEach((d) => { d.tabIndex = -1; });
+    target.tabIndex = 0;
+    target.focus();
+  }
+
   function renderCalendarGrid() {
     const first = new Date(state.calViewYear, state.calViewMonth, 1);
     const daysInMonth = new Date(state.calViewYear, state.calViewMonth + 1, 0).getDate();
@@ -477,28 +645,43 @@
       blank.className = 'quote-calendar__day quote-calendar__day--blank';
       els.calGrid.appendChild(blank);
     }
+    let firstEnabled = null;
     for (let day = 1; day <= daysInMonth; day++) {
       const iso = `${state.calViewYear}-${String(state.calViewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'quote-calendar__day';
       btn.textContent = day;
-      if (iso < todayIso) btn.disabled = true;
-      if (iso === state.moveDate) btn.setAttribute('data-selected', '');
-      if (iso === todayIso) btn.setAttribute('data-today', '');
-      btn.addEventListener('click', () => {
-        state.moveDate = iso;
-        els.moveDateTrigger.textContent = formatDateLabel(iso);
-        els.moveDateCalendar.hidden = true;
-        refreshLiveTotal();
+      const fullLabel = new Date(`${iso}T00:00:00`).toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      btn.setAttribute('aria-label', fullLabel);
+      btn.tabIndex = -1;
+      if (iso < todayIso) { btn.disabled = true; btn.setAttribute('aria-disabled', 'true'); }
+      else if (!firstEnabled) firstEnabled = btn;
+      if (iso === state.moveDate) { btn.setAttribute('data-selected', ''); btn.setAttribute('aria-selected', 'true'); btn.tabIndex = 0; }
+      else { btn.setAttribute('aria-selected', 'false'); }
+      if (iso === todayIso) { btn.setAttribute('data-today', ''); btn.setAttribute('aria-current', 'date'); }
+      btn.addEventListener('click', () => pickDate(iso));
+      btn.addEventListener('keydown', (e) => {
+        const map = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+        if (e.key in map) { e.preventDefault(); focusCalendarDay(btn, map[e.key]); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!btn.disabled) pickDate(iso); }
+        else if (e.key === 'Escape') { els.moveDateCalendar.hidden = true; els.moveDateTrigger.focus(); }
       });
       els.calGrid.appendChild(btn);
     }
+    // Ensure exactly one grid tab-stop, then move focus into it.
+    const selected = els.calGrid.querySelector('.quote-calendar__day[data-selected]');
+    const entry = selected || firstEnabled;
+    if (entry) { entry.tabIndex = 0; }
   }
 
   els.moveDateTrigger.addEventListener('click', () => {
     els.moveDateCalendar.hidden = !els.moveDateCalendar.hidden;
-    if (!els.moveDateCalendar.hidden) renderCalendarGrid();
+    if (!els.moveDateCalendar.hidden) {
+      renderCalendarGrid();
+      const entry = els.calGrid.querySelector('.quote-calendar__day[tabindex="0"]');
+      if (entry) setTimeout(() => entry.focus(), 0);
+    }
   });
   els.calPrevMonth.addEventListener('click', () => {
     state.calViewMonth -= 1;
@@ -662,19 +845,34 @@
   }
 
   /* ---------------------------------------------------------------- */
-  /* Form validation (checked at pay time, since this is a single form) */
+  /* Form validation — inline per field, checked at pay time (item 5)  */
   /* ---------------------------------------------------------------- */
 
-  function validateForm() {
-    const missing = [];
-    if (state.inZone !== true) missing.push('a pickup and drop-off address inside our Hatfield service area');
-    if (!state.vehicleType) missing.push('a truck (pick one, or use the load assistant)');
-    if (!state.moveDate) missing.push('a move date');
-    if (!state.timeSlot) missing.push('a time slot');
-    if (!state.customerName || state.customerName.trim().length < 2) missing.push('your full name');
-    if (!state.customerEmail || !/\S+@\S+\.\S+/.test(state.customerEmail)) missing.push('a valid email address');
-    if (!state.phone || state.phone.trim().length < 7) missing.push('a valid phone number');
-    return missing;
+  // Clear a field's error as soon as the user supplies a valid value.
+  function wireLiveClear() {
+    const revalidate = () => {
+      validationChecks().forEach((c) => { if (c.ok()) clearFieldError(c.el); });
+    };
+    [els.customerNameInput, els.customerEmailInput, els.phoneInput].forEach((el) => {
+      el.addEventListener('input', revalidate);
+      el.addEventListener('blur', revalidate);
+    });
+    els.pickupInput.addEventListener('change', revalidate);
+    els.dropoffInput.addEventListener('change', revalidate);
+    document.addEventListener('foq:field-change', revalidate);
+  }
+
+  function runValidation() {
+    const failed = [];
+    validationChecks().forEach((c) => {
+      if (c.ok()) {
+        clearFieldError(c.el);
+      } else {
+        setFieldError(c.el, c.msg);
+        failed.push(c);
+      }
+    });
+    return failed;
   }
 
   /* ---------------------------------------------------------------- */
@@ -682,10 +880,13 @@
   /* ---------------------------------------------------------------- */
 
   els.acceptQuoteBtn.addEventListener('click', async () => {
-    const missing = validateForm();
-    if (missing.length) {
-      showFormError(`Please add ${missing.join(', ')} before continuing.`);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    const failed = runValidation();
+    if (failed.length) {
+      showFormError(`${failed.length} thing${failed.length > 1 ? 's need' : ' needs'} your attention above.`);
+      const firstWrap = fieldWrap(failed[0].el);
+      firstWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const focusTarget = failed[0].el.matches('input, select, button') ? failed[0].el : failed[0].el.querySelector('input, select, button');
+      if (focusTarget) setTimeout(() => focusTarget.focus({ preventScroll: true }), 300);
       return;
     }
     clearFormError();
@@ -782,15 +983,38 @@
     els.invoiceLink.href = data.invoiceUrl;
 
     const bank = data.bankDetails;
+    const copyRow = (label, value) => `
+      <div class="quote-receipt__row quote-receipt__row--copy">
+        <span>${label}</span>
+        <span class="quote-receipt__copywrap"><span>${value}</span><button type="button" class="quote-copy-btn" data-copy="${String(value).replace(/"/g, '&quot;')}">Copy</button></span>
+      </div>`;
     els.confirmationBank.innerHTML = `
       <div class="quote-receipt__row"><span>Account holder</span><span>${bank.accountHolder}</span></div>
       <div class="quote-receipt__row"><span>Bank</span><span>${bank.bankName}</span></div>
-      <div class="quote-receipt__row"><span>Account number</span><span>${bank.accountNumber}</span></div>
-      <div class="quote-receipt__row"><span>Branch code</span><span>${bank.branchCode}</span></div>
-      <div class="quote-receipt__row"><span>SWIFT code</span><span>${bank.swiftCode}</span></div>
-      <div class="quote-receipt__row"><span>Payment reference</span><span>${data.referenceId}</span></div>
+      ${copyRow('Account number', bank.accountNumber)}
+      ${copyRow('Branch code', bank.branchCode)}
+      ${copyRow('SWIFT code', bank.swiftCode)}
+      ${copyRow('Payment reference', data.referenceId)}
       <div class="quote-receipt__total"><span>Deposit to pay</span><span>R${Math.round(data.depositAmount)}</span></div>
     `;
+    els.confirmationBank.querySelectorAll('.quote-copy-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const text = btn.dataset.copy;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+          }
+          const prev = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.setAttribute('data-copied', '');
+          setTimeout(() => { btn.textContent = prev; btn.removeAttribute('data-copied'); }, 1600);
+        } catch (e) { /* clipboard blocked — leave the value visible to select manually */ }
+      });
+    });
 
     els.confirmationWhatsapp.href = whatsappUrl(buildWhatsappMessage({
       referenceId: data.referenceId,
@@ -801,6 +1025,7 @@
 
     els.quoteMain.hidden = true;
     els.stickyTotal.hidden = true;
+    if (els.progress) els.progress.hidden = true;
     els.confirmation.hidden = false;
     window.scrollTo({ top: 0 });
   }
@@ -839,6 +1064,53 @@
   }
 
   /* ---------------------------------------------------------------- */
+  /* Header mobile nav (ported from script.js's pattern)               */
+  /* ---------------------------------------------------------------- */
+
+  function initMobileNav() {
+    if (!els.navToggle || !els.mobileNavPanel) return;
+    const HAMBURGER = 'M4 7H20M4 12H20M4 17H20';
+    const CLOSE = 'M6 6L18 18M6 18L18 6';
+    const setOpen = (open) => {
+      els.mobileNavPanel.hidden = !open;
+      els.navToggle.setAttribute('aria-expanded', String(open));
+      if (els.navToggleIcon) els.navToggleIcon.setAttribute('d', open ? CLOSE : HAMBURGER);
+    };
+    els.navToggle.addEventListener('click', () => setOpen(els.mobileNavPanel.hidden));
+    els.mobileNavPanel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Step / scroll progress indicator (item 4)                         */
+  /* ---------------------------------------------------------------- */
+
+  function initProgress() {
+    if (!els.progressFill || !els.progressLabel) return;
+    const sections = $$('.quote-section[data-step]');
+    const total = sections.length;
+    if (!total) return;
+
+    const setStep = (n, label) => {
+      const pct = Math.round((n / total) * 100);
+      els.progressFill.style.width = `${pct}%`;
+      els.progressLabel.textContent = `Step ${n} of ${total} · ${label}`;
+      if (els.progress) els.progress.setAttribute('aria-valuenow', String(pct));
+    };
+    setStep(1, sections[0].dataset.stepLabel || 'Route');
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const n = Number(entry.target.dataset.step);
+          setStep(n, entry.target.dataset.stepLabel || '');
+        });
+      }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+      sections.forEach((s) => io.observe(s));
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /* Boot                                                               */
   /* ---------------------------------------------------------------- */
 
@@ -846,6 +1118,9 @@
     updateHelpersButtons();
     updateTripsButtons();
     showReceiptPlaceholder('Add your pickup, drop-off and truck above to see your price.');
+    initMobileNav();
+    initProgress();
+    wireLiveClear();
 
     updateWhatsappFallback();
     setInterval(updateWhatsappFallback, 1000);

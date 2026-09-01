@@ -1,30 +1,40 @@
 /* ============ Tokens ============ */
+/* Aligned to the approved homepage system (index.html): lime accent,
+   charcoal-navy, warm cream, sharp 2px corners, IBM Plex Sans / Archivo.
+   styles.css is loaded only by quote.html, so these are quote-tool tokens. */
 :root {
-  --navy-deep: #0B2340;
-  --navy: #123A66;
-  --navy-soft: #1B4A80;
-  --gold: #CC9A3C;
-  --gold-bright: #E3B24E;
-  --gold-deep: #8A6620; /* accessible on-light text/icon variant of --gold */
-  /* Metallic gold for gold SURFACES only (buttons, bands, icon chips) — matches the
-     brushed-ring gradient in the logo mark. Text stays flat --gold/--gold-bright/
-     --gold-deep for legibility; gradient-fill text is a different, muddier effect. */
-  --gold-metal: linear-gradient(122deg, #7A5A1C 0%, #CC9A3C 22%, #F4E4B8 44%, #E3B24E 58%, #CC9A3C 78%, #7A5A1C 100%);
-  --gold-metal-wide: linear-gradient(100deg, #7A5A1C 0%, #CC9A3C 9%, #F4E4B8 18%, #CC9A3C 27%, #7A5A1C 36%, #CC9A3C 45%, #F4E4B8 54%, #CC9A3C 63%, #7A5A1C 72%, #CC9A3C 81%, #F4E4B8 90%, #CC9A3C 100%);
-  --teal: #1C8C86;
-  --teal-deep: #146661;
-  --canvas: #FAF7F2;
-  --panel: #EFF3F6;
-  --ink: #16232E;
-  --ink-soft: #4C5A66;
-  --cream: #F4EFE4;
+  --navy-deep: #0B1D26;   /* charcoal-navy — primary dark */
+  --navy: #10303D;         /* dark surface / hover */
+  --navy-soft: #16414F;    /* lighter dark surface */
+  --lime: #C8E64B;         /* primary accent */
+  --lime-bright: #D8F168;  /* accent hover */
+  --lime-dim: rgba(200,230,75,.14); /* tint fill for selected/hover states */
+  --lime-line: rgba(200,230,75,.55);
+
+  --canvas: #F7F5F0;       /* warm cream page ground */
+  --panel: #EDEAE1;        /* warm panel / chip ground */
+  --ink: #0B1D26;
+  --ink-soft: #4C5C62;
+  --ink-mute: #7A8A8F;     /* mono labels / captions */
+  --cream: #F7F5F0;
   --error: #B3261E;
-  --line: rgba(11,35,64,.12);
-  --shadow: 0 20px 50px -20px rgba(11,35,64,.35);
-  --radius: 14px;
+  --line: #D9D4C8;         /* warm card border */
+  --line-soft: #E4E0D6;
+  --shadow: 0 20px 50px -20px rgba(11,29,38,.35);
+  --radius: 2px;
   --font-display: "Archivo", sans-serif;
-  --font-hero: "Bebas Neue", "Archivo", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-hero: "Archivo", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Legacy aliases — existing quote.css rules resolve these names.
+     Teal selected-states now read as the homepage's lime language;
+     "deep" variants map to navy so on-light text stays legible. */
+  --teal: #C8E64B;
+  --teal-deep: #10303D;
+  --gold: #C8E64B;
+  --gold-bright: #D8F168;
+  --gold-deep: #10303D;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,8 +68,8 @@ input, select, textarea { font: inherit; }
 }
 
 :focus-visible {
-  outline: 3px solid var(--teal);
-  outline-offset: 3px;
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
 }
 
 /* ============ Type helpers ============ */
@@ -103,17 +113,17 @@ input, select, textarea { font: inherit; }
   font-size: 0.92rem;
   letter-spacing: 0.01em;
   padding: 12px 22px;
-  border-radius: 10px;
+  border-radius: var(--radius);
   border: 1.5px solid transparent;
   transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 .btn svg { width: 18px; height: 18px; }
 .btn--lg { padding: 15px 28px; font-size: 0.98rem; }
 .btn--full { width: 100%; }
-.btn--gold { background: var(--gold-metal); color: var(--navy-deep); }
-.btn--gold:hover { filter: brightness(1.1) saturate(1.05); transform: translateY(-2px); }
-.btn--outline { border-color: rgba(255,255,255,.4); color: var(--navy-deep); background: rgba(255,255,255,.6); }
-.btn--outline:hover { border-color: var(--teal); background: #fff; transform: translateY(-2px); }
+.btn--gold { background: var(--lime); color: var(--navy-deep); border-radius: var(--radius); }
+.btn--gold:hover { background: var(--lime-bright); transform: translateY(-2px); }
+.btn--outline { border-color: rgba(255,255,255,.4); color: var(--navy-deep); background: rgba(255,255,255,.6); border-radius: var(--radius); }
+.btn--outline:hover { border-color: var(--lime); background: #fff; transform: translateY(-2px); }
 .btn--ghost { border-color: rgba(244,239,228,.5); color: var(--cream); }
 .btn--ghost:hover { border-color: var(--gold); color: var(--gold-bright); }
 

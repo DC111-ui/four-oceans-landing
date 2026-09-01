@@ -26,29 +26,55 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=1">
-<link rel="stylesheet" href="quote.css?v=4">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="quote.css?v=6">
 </head>
 <body class="quote-body">
 
-<header class="quote-header">
-  <a class="quote-header__back" href="index.html#services" aria-label="Back to Four Oceans Group site">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </a>
-  <span class="quote-header__brand">
-    <img class="quote-header__logo" src="assets/logo-mark.png" alt="Four Oceans Group" width="28" height="28">
-    <span class="quote-header__title">Get Your Quote</span>
-  </span>
-  <span class="quote-header__spacer" aria-hidden="true"></span>
+<div class="quote-headwrap">
+<header class="foq-topbar">
+  <div class="foq-topbar__inner">
+    <a class="foq-brand" href="index.html#top">
+      <img src="assets/logo-mark.png" alt="Four Oceans Group" width="34" height="34">
+      <span class="foq-brand__word">Four Oceans<span>Group</span></span>
+    </a>
+    <nav class="foq-nav">
+      <a href="index.html#services">Services</a>
+      <a href="index.html#who-we-serve">Who We Serve</a>
+      <a href="index.html#campaign">Campaign</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <div class="foq-topbar__actions">
+      <a class="foq-topbar__phone" href="tel:+27617037902">+27 61 703 7902</a>
+      <button type="button" id="navToggle" class="foq-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path id="navToggleIcon" d="M4 7H20M4 12H20M4 17H20"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div id="mobileNavPanel" class="foq-mobile-nav" hidden>
+    <nav>
+      <a href="index.html#services">Services</a>
+      <a href="index.html#who-we-serve">Who We Serve</a>
+      <a href="index.html#campaign">Campaign</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="tel:+27617037902">+27 61 703 7902</a>
+    </nav>
+  </div>
 </header>
+<div class="quote-progress" role="progressbar" aria-label="Form progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="quoteProgress">
+  <div class="quote-progress__track"><span class="quote-progress__fill" id="quoteProgressFill"></span></div>
+  <span class="quote-progress__label" id="quoteProgressLabel">Step 1 of 5 · Route</span>
+</div>
+</div>
 
 <main class="quote-main" id="quoteMain">
 <h1 class="sr-only">Get Your Quote — Hatfield Student Relocations</h1>
 <div class="quote-main__form">
 
   <!-- ============ ROUTE ============ -->
-  <section class="quote-section">
+  <section class="quote-section" id="stepRoute" data-step="1" data-step-label="Route">
+    <p class="quote-section__eyebrow">Step 1 of 5 — Route</p>
     <h2 class="quote-step__title">Where are you moving?</h2>
     <p class="quote-step__hint">Hatfield student relocations only, for now — pickup and drop-off both need to be in the Hatfield/Brooklyn/Colbyn/Sunnyside/Arcadia/Menlo Park area.</p>
 
@@ -66,16 +92,19 @@
   </section>
 
   <!-- ============ TRUCK SELECTION ============ -->
-  <section class="quote-section">
+  <section class="quote-section" id="stepTruck" data-step="2" data-step-label="Truck">
+    <p class="quote-section__eyebrow">Step 2 of 5 — Truck</p>
     <h2 class="quote-step__title">Truck selection</h2>
     <p class="quote-step__hint">Pick the truck for your move, or use the load assistant if you're not sure.</p>
 
     <div class="quote-radio-cards quote-radio-cards--vehicles" id="vehicleCards"></div>
+    <p class="quote-cards-note">Prices show a starting fare — the final price depends on floors, helpers and extras you set below.</p>
     <button type="button" class="quote-text-link" id="loadAssistantTrigger">Not sure which truck fits? Use the load assistant</button>
   </section>
 
   <!-- ============ MOVE REQUIREMENTS ============ -->
-  <section class="quote-section">
+  <section class="quote-section" id="stepRequirements" data-step="3" data-step-label="Requirements">
+    <p class="quote-section__eyebrow">Step 3 of 5 — Requirements</p>
     <h2 class="quote-step__title">Move requirements</h2>
     <p class="quote-step__hint">Stairs without a working lift add time and crew, so we ask about pickup and drop-off separately.</p>
 
@@ -109,7 +138,7 @@
           <input type="checkbox" id="pickupLiftToggle">
         </div>
       </div>
-      <label class="quote-checkbox"><input type="checkbox" id="pickupLiftTooSmall"> The lift is too small for our furniture</label>
+      <label class="quote-checkbox" id="pickupLiftTooSmallWrap" hidden><input type="checkbox" id="pickupLiftTooSmall"> The lift is too small for our furniture</label>
       <p class="quote-access-preview" id="pickupAccessPreview"></p>
     </div>
 
@@ -134,7 +163,7 @@
           <input type="checkbox" id="dropoffLiftToggle">
         </div>
       </div>
-      <label class="quote-checkbox"><input type="checkbox" id="dropoffLiftTooSmall"> The lift is too small for our furniture</label>
+      <label class="quote-checkbox" id="dropoffLiftTooSmallWrap" hidden><input type="checkbox" id="dropoffLiftTooSmall"> The lift is too small for our furniture</label>
       <p class="quote-access-preview" id="dropoffAccessPreview"></p>
     </div>
 
@@ -154,7 +183,8 @@
   </section>
 
   <!-- ============ SCHEDULE ============ -->
-  <section class="quote-section">
+  <section class="quote-section" id="stepSchedule" data-step="4" data-step-label="Schedule">
+    <p class="quote-section__eyebrow">Step 4 of 5 — Schedule</p>
     <h2 class="quote-step__title">Schedule</h2>
     <p class="quote-step__hint">Same-day bookings are welcome at no extra cost — a small fee applies only for next-day notice.</p>
 
@@ -198,8 +228,10 @@
   </section>
 
   <!-- ============ GOODS IN TRANSIT COVER ============ -->
-  <section class="quote-section">
-    <h2 class="quote-step__title">Goods in Transit cover</h2>
+  <section class="quote-section quote-section--optional" id="stepCover" data-step="5" data-step-label="Cover">
+    <p class="quote-section__eyebrow">Step 5 of 5 — Cover</p>
+    <h2 class="quote-step__title">Goods in Transit cover <span class="quote-section__tag">Optional</span></h2>
+    <p class="quote-step__hint">Add cover for the declared value of your belongings while they're in transit. Skip it if you'd rather not.</p>
 
     <div class="quote-field">
       <label class="quote-checkbox"><input type="checkbox" id="gitCoverToggle"> Request cover</label>
@@ -216,7 +248,8 @@
 </div>
 <div class="quote-main__summary">
   <!-- ============ YOUR QUOTE ============ -->
-  <section class="quote-section quote-section--summary">
+  <section class="quote-section quote-section--summary" id="stepSummary">
+    <p class="quote-section__eyebrow">Live preview</p>
     <h2 class="quote-step__title">Your quote</h2>
     <p class="quote-step__hint">Live price preview for this request.</p>
 
@@ -238,6 +271,24 @@
       </div>
     </div>
   </section>
+
+  <div class="quote-aside-support">
+    <p class="quote-aside-support__title">How this works</p>
+    <ul>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        <span><strong>Firm price up front.</strong> The quote you see is the price — no surprises on the day, unless the actual load differs from what you told us.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 10h18"/></svg>
+        <span><strong>50% deposit by EFT</strong> confirms your slot. The balance is settled with the team on move day.</span>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span><strong>Prefer to talk it through?</strong> <a href="tel:+27617037902">Call +27&nbsp;61&nbsp;703&nbsp;7902</a> or message us on WhatsApp any time.</span>
+      </li>
+    </ul>
+  </div>
 </div>
 </main>
 
@@ -265,41 +316,70 @@
   </div>
 </section>
 
+<footer class="quote-footer">
+  <span>&copy; 2026 Four Oceans Group.</span>
+  <a href="https://darlingtonchanakira.com" target="_blank" rel="noopener">Site by Darlington Chanakira</a>
+</footer>
+
 <!-- ============ LOAD ASSISTANT MODAL ============ -->
 <div class="quote-modal" id="loadAssistantModal" hidden>
   <div class="quote-modal__backdrop" id="loadAssistantBackdrop"></div>
-  <div class="quote-modal__panel" role="dialog" aria-modal="true" aria-label="Household load assistant">
+  <div class="quote-modal__panel" role="dialog" aria-modal="true" aria-label="Household load assistant" tabindex="-1">
     <div class="quote-modal__header">
       <h3>Household load assistant</h3>
       <button type="button" class="quote-modal__close" id="loadAssistantClose" aria-label="Close">×</button>
     </div>
 
     <div class="quote-modal__body">
-      <p class="quote-step__hint">Add quantities to get a truck recommendation.</p>
+      <p class="quote-step__hint">Add quantities room by room to get a truck recommendation.</p>
 
-      <div class="quote-field">
-        <label>Bedroom</label>
-        <div class="quote-item-list" id="itemsBedroom"></div>
+      <div class="quote-accordion" data-group="bedroom" data-open>
+        <button type="button" class="quote-accordion__head" aria-expanded="true" aria-controls="itemsBedroom">
+          <span>Bedroom</span>
+          <span class="quote-accordion__count" data-count-for="bedroom" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel"><div class="quote-item-list" id="itemsBedroom"></div></div>
       </div>
-      <div class="quote-field">
-        <label>Kitchen</label>
-        <div class="quote-item-list" id="itemsKitchen"></div>
+      <div class="quote-accordion" data-group="kitchen">
+        <button type="button" class="quote-accordion__head" aria-expanded="false" aria-controls="itemsKitchen">
+          <span>Kitchen</span>
+          <span class="quote-accordion__count" data-count-for="kitchen" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel" hidden><div class="quote-item-list" id="itemsKitchen"></div></div>
       </div>
-      <div class="quote-field">
-        <label>Living area</label>
-        <div class="quote-item-list" id="itemsLiving"></div>
+      <div class="quote-accordion" data-group="living">
+        <button type="button" class="quote-accordion__head" aria-expanded="false" aria-controls="itemsLiving">
+          <span>Living area</span>
+          <span class="quote-accordion__count" data-count-for="living" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel" hidden><div class="quote-item-list" id="itemsLiving"></div></div>
       </div>
-      <div class="quote-field">
-        <label>Office / Study</label>
-        <div class="quote-item-list" id="itemsOffice"></div>
+      <div class="quote-accordion" data-group="office">
+        <button type="button" class="quote-accordion__head" aria-expanded="false" aria-controls="itemsOffice">
+          <span>Office / Study</span>
+          <span class="quote-accordion__count" data-count-for="office" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel" hidden><div class="quote-item-list" id="itemsOffice"></div></div>
       </div>
-      <div class="quote-field">
-        <label>Outdoor</label>
-        <div class="quote-item-list" id="itemsOutdoor"></div>
+      <div class="quote-accordion" data-group="outdoor">
+        <button type="button" class="quote-accordion__head" aria-expanded="false" aria-controls="itemsOutdoor">
+          <span>Outdoor</span>
+          <span class="quote-accordion__count" data-count-for="outdoor" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel" hidden><div class="quote-item-list" id="itemsOutdoor"></div></div>
       </div>
-      <div class="quote-field">
-        <label>Other</label>
-        <div class="quote-item-list" id="itemsOther"></div>
+      <div class="quote-accordion" data-group="other">
+        <button type="button" class="quote-accordion__head" aria-expanded="false" aria-controls="itemsOther">
+          <span>Other</span>
+          <span class="quote-accordion__count" data-count-for="other" data-empty>0</span>
+          <svg class="quote-accordion__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="quote-accordion__panel" hidden><div class="quote-item-list" id="itemsOther"></div></div>
       </div>
 
       <div class="quote-load-summary" id="loadSummary">
@@ -333,6 +413,6 @@
   googleMapsApiKey: 'AIzaSyDfUfu0EJ0ovJ8ncr3nERWF2LQLjsCRQ1U',
   whatsappNumber: '27617037902'
 };</script>
-<script src="quote.js?v=2"></script>
+<script src="quote.js?v=3"></script>
 </body>
 </html>
