@@ -1,0 +1,11 @@
+{
+  "name": "Four Oceans Group",
+  "short_name": "Four Oceans",
+  "icons": [
+    { "src": "assets/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "assets/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#F7F5F0",
+  "background_color": "#F7F5F0",
+  "display": "browser"
+}
